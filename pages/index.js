@@ -4,8 +4,11 @@ import TrendingNews from '../components/TrendingNews';
 import NewsCard from '../components/NewsCard';
 
 export async function getServerSideProps() {
-  const res = await fetch('https://your-backend.onrender.com/api/news');
+  const res = await fetch(
+    'https://newspulse-backend-real.onrender.com/api/news',
+  );
   const news = await res.json();
+
   return { props: { news } };
 }
 
@@ -14,7 +17,10 @@ export default function Home({ news }) {
     <div>
       <Head>
         <title>News Pulse - Your Pulse on What Matters Most</title>
-        <meta name="description" content="Get latest breaking news, trending stories, and much more." />
+        <meta
+          name="description"
+          content="Get latest breaking news, trending stories, and much more."
+        />
       </Head>
       <BreakingNews news={news} />
       <TrendingNews news={news} />
