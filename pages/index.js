@@ -13,7 +13,7 @@ export default function Home() {
           AI Revolutionizes News Industry with Speed & Accuracy
         </h1>
         <p className="text-gray-600 mt-2">
-          Published on May 5, 2025 | by NewsPulse Editorial Team
+          Published on May 5, 2025 | by News Pulse Editorial Team
         </p>
         <p className="text-gray-700 mt-4">
           In a historic shift, AI tools are now being used to power newsrooms across the globe — from writing articles to verifying facts in real-time.
