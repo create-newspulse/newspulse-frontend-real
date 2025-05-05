@@ -1,8 +1,7 @@
-import * as gtag from '../lib/gtag';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
-import * as gtag from '../lib/gtag'; // Keep this for event tracking if needed
+import * as gtag from '../lib/gtag'; // ✅ Keep this once
 import '../styles/globals.css';
 
 export default function MyApp({ Component, pageProps }) {
