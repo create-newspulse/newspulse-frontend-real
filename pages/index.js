@@ -5,20 +5,20 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>NewsPulse – Real-time Verified News Powered by AI</title>
+        <title>News Pulse – Real-time Verified News Powered by AI</title>
         <meta
           name="description"
-          content="Breaking headlines, trending stories, and AI-verified facts. NewsPulse delivers fast, accurate news across India and beyond."
+          content="Breaking headlines, trending stories, and AI-verified facts. News Pulse delivers fast, accurate news across India and beyond."
         />
         <meta
           name="keywords"
-          content="NewsPulse, Breaking News, AI News, India News, Tech News, Real-time Headlines"
+          content="News Pulse, Breaking News, AI News, India News, Tech News, Real-time Headlines"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="UTF-8" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="NewsPulse – Real-time Verified News Powered by AI" />
+        <meta property="og:title" content="News Pulse – Real-time Verified News Powered by AI" />
         <meta
           property="og:description"
           content="Get the latest AI-powered news from around the world. Instantly verified, lightning fast."
@@ -29,7 +29,7 @@ export default function Home() {
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="NewsPulse – Real-time Verified News Powered by AI" />
+        <meta name="twitter:title" content="News Pulse – Real-time Verified News Powered by AI" />
         <meta name="twitter:description" content="Your trusted source for live news, verified by AI." />
         <meta name="twitter:image" content="/cover.jpg" />
       </Head>
@@ -48,14 +48,15 @@ export default function Home() {
           <h2 className="text-xl font-bold mt-3">
             AI Revolutionizes News Industry with Speed & Accuracy
           </h2>
-          <p className="text-gray-600 mt-2">Published on May 5, 2025 by NewsPulse Editorial Team</p>
+          <p className="text-gray-600 mt-2">Published on May 5, 2025 by News Pulse Editorial Team</p>
           <p className="mt-2 text-gray-700">
             AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever.
           </p>
+
           <button
             onClick={() => {
               const message = new SpeechSynthesisUtterance(
-                "AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever."
+                'AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever.'
               );
               message.lang = 'en-IN';
               message.pitch = 1;
