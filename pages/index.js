@@ -5,17 +5,33 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>News Pulse - Real-time News with AI Power</title>
+        <title>NewsPulse – Real-time Verified News Powered by AI</title>
         <meta
           name="description"
-          content="Get breaking news, trending stories, and verified facts powered by AI. NewsPulse delivers real-time updates with unmatched speed and accuracy."
+          content="Breaking headlines, trending stories, and AI-verified facts. NewsPulse delivers fast, accurate news across India and beyond."
         />
         <meta
           name="keywords"
-          content="NewsPulse, AI News, Breaking News, India News, Technology News, Verified Headlines"
+          content="NewsPulse, Breaking News, AI News, India News, Tech News, Real-time Headlines"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="UTF-8" />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="NewsPulse – Real-time Verified News Powered by AI" />
+        <meta
+          property="og:description"
+          content="Get the latest AI-powered news from around the world. Instantly verified, lightning fast."
+        />
+        <meta property="og:image" content="/cover.jpg" />
+        <meta property="og:url" content="https://newspulse.co.in/" />
+        <meta property="og:type" content="website" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="NewsPulse – Real-time Verified News Powered by AI" />
+        <meta name="twitter:description" content="Your trusted source for live news, verified by AI." />
+        <meta name="twitter:image" content="/cover.jpg" />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-16">
@@ -28,15 +44,11 @@ export default function Home() {
 
         {/* 🧨 Breaking News */}
         <section className="bg-white p-6 rounded-lg shadow-md mb-10">
-          <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs">
-            Breaking
-          </span>
+          <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs">Breaking</span>
           <h2 className="text-xl font-bold mt-3">
             AI Revolutionizes News Industry with Speed & Accuracy
           </h2>
-          <p className="text-gray-600 mt-2">
-            Published on May 5, 2025 by NewsPulse Editorial Team
-          </p>
+          <p className="text-gray-600 mt-2">Published on May 5, 2025 by NewsPulse Editorial Team</p>
           <p className="mt-2 text-gray-700">
             AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever.
           </p>
