@@ -1,7 +1,9 @@
+// pages/_app.js
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
-import * as gtag from '../lib/gtag';
+import * as gtag from '../gtag'; // Adjust path if needed
+import '../styles/globals.css'; // Keep your global styles if present
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -18,7 +20,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      {/* Google Analytics Script */}
+      {/* Global Site Tag (gtag.js) - Google Analytics */}
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
