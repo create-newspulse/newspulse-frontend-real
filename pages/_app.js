@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
-import * as gtag from '../lib/gtag';
-import '../styles/globals.css'; // if you're using global styles
+import * as gtag from '../lib/gtag'; // Keep this for event tracking if needed
+import '../styles/globals.css';
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -19,25 +19,24 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      {/* Google Analytics Script */}
+      {/* ✅ Google Analytics Script */}
       <Script
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=G-9YPR93VVX4`}
       />
       <Script
         id="gtag-init"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${gtag.GA_TRACKING_ID}', {
-            page_path: window.location.pathname,
-          });
-        `,
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-9YPR93VVX4');
+          `,
         }}
       />
+
       <Component {...pageProps} />
     </>
   );
