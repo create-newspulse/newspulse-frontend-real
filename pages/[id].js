@@ -6,8 +6,8 @@ export default function NewsDetail() {
 
   return (
     <div>
-      <h1>News Article: {id}</h1>
-      {/* Load article details by ID */}
+      <h1>News Detail Page</h1>
+      <p>Showing details for article ID: {id}</p>
     </div>
   );
 }
