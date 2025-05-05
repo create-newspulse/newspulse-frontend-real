@@ -52,6 +52,20 @@ export default function Home() {
           <p className="mt-2 text-gray-700">
             AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever.
           </p>
+          <button
+            onClick={() => {
+              const message = new SpeechSynthesisUtterance(
+                "AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever."
+              );
+              message.lang = 'en-IN';
+              message.pitch = 1;
+              message.rate = 1;
+              window.speechSynthesis.speak(message);
+            }}
+            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm transition"
+          >
+            🔊 Listen to this news
+          </button>
         </section>
 
         {/* 🔥 Trending Stories */}
