@@ -65,9 +65,9 @@ export default function Home() {
       {/* 🔘 View More News Button */}
       <div className="mt-6 text-center">
         <Link href="/news">
-          <a className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-sm transition inline-block">
+          <span className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-sm transition inline-block cursor-pointer">
             View More News
-          </a>
+          </span>
         </Link>
       </div>
     </div>
