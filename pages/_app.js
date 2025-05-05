@@ -1,8 +1,8 @@
+import '../styles/globals.css';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
-import * as gtag from '../lib/gtag';
-import '../styles/globals.css';
+import * as gtag from '../lib/gtag'; // ✅ Only once
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -27,12 +27,12 @@ export default function MyApp({ Component, pageProps }) {
         id="gtag-init"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: \`
+          __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-9YPR93VVX4');
-          \`,
+          `,
         }}
       />
       <Component {...pageProps} />
