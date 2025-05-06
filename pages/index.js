@@ -24,18 +24,28 @@ export default function Home() {
       {/* 🧠 Sticky Navigation */}
       <NavBar />
 
-      {/* 🔴 Breaking News Bar */}
+      {/* 🔴 Breaking News Ticker */}
       <BreakingTicker />
 
-      {/* 🌍 Hero + Main Content */}
+      {/* 🌍 Main Content */}
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-800 px-4 py-10">
-        <div className="max-w-3xl mx-auto">
-          <section>
-            <h2 className="text-2xl font-bold text-blue-700 border-b pb-2 mb-4">
-              📰 Top Stories
-            </h2>
+        <div className="max-w-3xl mx-auto px-4 sm:px-0">
+          
+          {/* 🎬 Animated Hero Banner */}
+          <div className="text-center animate-fade-in mb-10">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-blue-700 drop-shadow-sm">
+              Welcome to <span className="text-red-600">News Pulse</span>
+            </h1>
+            <p className="mt-3 text-lg sm:text-xl text-gray-600 animate-pulse">
+              Real-time updates. Verified headlines. AI-powered accuracy.
+            </p>
+          </div>
 
-            {/* ✅ Render Top News Section */}
+          {/* 📰 Top Stories Section */}
+          <section className="animate-pulse-on-load">
+            <h2 className="text-2xl font-bold text-blue-700 border-b pb-2 mb-4 flex items-center gap-2">
+              📰 <span>Top Stories</span>
+            </h2>
             <TopNews />
           </section>
         </div>
@@ -43,4 +53,3 @@ export default function Home() {
     </>
   );
 }
-
