@@ -11,19 +11,23 @@ export default function TopNews() {
   }, []);
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4 text-blue-700">📰 Top Stories</h2>
-      <ul className="space-y-2">
+    <section className="bg-gray-50 py-6 px-4 rounded-xl shadow-md mt-10 max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-blue-800 border-b-2 border-blue-300 pb-2">📰 Top Stories</h2>
+      <ul className="space-y-4">
         {news.map((article, i) => (
-          <li key={i} className="bg-white p-3 rounded-lg shadow-md hover:bg-gray-50 transition">
-            <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">
+          <li key={i} className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-lg font-semibold text-blue-700 hover:underline"
+            >
               {article.title}
             </a>
             <p className="text-sm text-gray-600 mt-1">{article.source.name}</p>
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }
-
