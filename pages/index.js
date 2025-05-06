@@ -1,3 +1,4 @@
+import BreakingTicker from '../components/BreakingTicker';
 import Head from 'next/head';
 import NewsReader from '../components/NewsReader';
 
