@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
 import BreakingTicker from '../components/BreakingTicker';
+import TopNews from '../components/TopNews'; // ✅ Importing live Top News section
 
 export default function Home() {
   return (
@@ -44,6 +45,11 @@ export default function Home() {
               AI tools are now driving newsrooms—writing, verifying, and distributing global news faster than ever.
             </p>
           </article>
+
+          {/* ✅ Live Top News Section from NewsAPI */}
+          <section className="mt-10">
+            <TopNews />
+          </section>
         </div>
       </main>
     </>
