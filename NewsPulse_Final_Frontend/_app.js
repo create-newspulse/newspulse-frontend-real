@@ -1,0 +1,1 @@
+// Next.js custom App with full homepage structure
