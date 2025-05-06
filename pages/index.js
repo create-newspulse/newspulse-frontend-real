@@ -7,13 +7,20 @@ export default function Home() {
     <>
       <Head>
         <title>News Pulse – Real-time Verified News Powered by AI</title>
-        <meta name="description" content="Breaking news & trending headlines, verified with AI. Covering India & beyond." />
+        <meta
+          name="description"
+          content="Breaking news & trending headlines, verified with AI. Covering India & beyond."
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <NavBar /> {/* ✅ Sticky Navigation */}
-      <BreakingTicker /> {/* ✅ Live Breaking Ticker */}
+      {/* 🔵 Sticky Navbar */}
+      <NavBar />
 
+      {/* 🔴 Breaking News Ticker Bar */}
+      <BreakingTicker />
+
+      {/* 📰 Main Content */}
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-800 px-4 py-10">
         <div className="max-w-3xl mx-auto animate-fade-in">
           <header className="text-center mb-8">
@@ -24,7 +31,9 @@ export default function Home() {
           </header>
 
           <article className="bg-white p-6 rounded-xl shadow-md space-y-4 border-l-4 border-red-600">
-            <span className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Breaking</span>
+            <span className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+              Breaking
+            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
               AI Revolutionizes News Industry with Speed & Accuracy
             </h2>
