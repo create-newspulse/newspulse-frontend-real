@@ -1,3 +1,4 @@
+import TopNews from '../components/TopNews';
 import Head from 'next/head';
 import NavBar from '../components/NavBar';
 import BreakingTicker from '../components/BreakingTicker';
