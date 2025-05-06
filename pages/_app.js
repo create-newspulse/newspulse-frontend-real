@@ -1,8 +1,8 @@
-import '../styles/globals.css';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
-import * as gtag from '../lib/gtag'; // ✅ Only once
+import * as gtag from '../lib/gtag';
+import '../styles/globals.css';
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function MyApp({ Component, pageProps }) {
     <>
       <Script
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=G-9YPR93VVX4`}
+        src="https://www.googletagmanager.com/gtag/js?id=G-9YPR93VVX4"
       />
       <Script
         id="gtag-init"
