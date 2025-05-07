@@ -1,29 +1,28 @@
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
-import TrendingStories from '../components/TrendingStories';
+import TrendingNow from '../components/TrendingNow';
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
+import { filterArticlesByRegion } from '../utils/filterArticlesByRegion';
 
-export default function IndiaPage({ topHeadlines }) {
+export default function IndiaNews({ topHeadlines }) {
   return (
-    <section className="p-4 space-y-8">
+    <>
       <BreakingTicker />
-      <h1 className="text-3xl font-bold text-center text-blue-600">🔵 India News Pulse</h1>
-
-      {topHeadlines.length > 0 ? (
+      <main className="p-6 space-y-10">
+        <h1 className="text-3xl font-bold text-center">
+          🔵 India News Pulse
+        </h1>
         <TopNews articles={topHeadlines} />
-      ) : (
-        <p className="text-center text-yellow-600 font-semibold">
-          ⚠️ No top news articles found.
-        </p>
-      )}
-
-      <TrendingStories articles={topHeadlines} />
-    </section>
+        <TrendingNow />
+      </main>
+    </>
   );
 }
 
 export async function getStaticProps() {
-  const topHeadlines = await fetchTopNewswithAutoKey('general');
+  const allArticles = await fetchTopNewswithAutoKey('general');
+  const topHeadlines = filterArticlesByRegion(allArticles, 'india');
+
   return {
     props: {
       topHeadlines,
