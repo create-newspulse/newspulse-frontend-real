@@ -1,4 +1,3 @@
-// components/TopNews.js
 import { useEffect, useState } from 'react';
 import { fetchTopNewsByCategory } from '../lib/fetchTopNews';
 
@@ -39,16 +38,30 @@ export default function TopNews() {
         ))}
       </div>
 
-      {/* 📰 News Cards */}
+      {/* 📰 News Grid / Reel */}
       {loading ? (
         <p className="text-center text-gray-500 animate-pulse">Loading top news...</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto snap-x sm:snap-none pb-4">
           {news.map((article, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition duration-300 animate-pulse-on-load"
+              className="bg-white rounded-xl shadow-md p-4 min-w-[280px] snap-start animate-pulse-on-load hover:shadow-lg transition duration-300"
             >
+              {/* 🖼️ Thumbnail */}
+              {article.urlToImage ? (
+                <img
+                  src={article.urlToImage}
+                  alt="News Thumbnail"
+                  className="w-full h-40 object-cover rounded-md mb-3"
+                />
+              ) : (
+                <div className="w-full h-40 bg-gray-100 rounded-md mb-3 flex items-center justify-center text-sm text-gray-400">
+                  No Image
+                </div>
+              )}
+
+              {/* 📄 Content */}
               <a href={article.url} target="_blank" rel="noopener noreferrer">
                 <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 line-clamp-2 mb-2">
                   {article.title}
