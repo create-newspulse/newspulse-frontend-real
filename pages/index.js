@@ -1,23 +1,34 @@
 import BreakingTicker from '../components/BreakingTicker';
-
-<BreakingTicker />
 import TopNews from '../components/TopNews';
+import TrendingStories from '../components/TrendingStories';
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
-import { filterArticlesByRegion } from '../utils/filterArticlesByRegion';
 
 export default function Home({ topHeadlines }) {
   return (
-    <main className="p-6 space-y-10">
-      <h1 className="text-3xl font-bold text-center">📰 Today’s Highlights</h1>
-      <TopNews articles={topHeadlines} />
-    </main>
+    <section className="p-4 space-y-8">
+      {/* 🔴 Breaking News Ticker */}
+      <BreakingTicker />
+
+      {/* 📰 Page Heading */}
+      <h1 className="text-3xl font-bold text-center">🟢 Gujarat News Pulse</h1>
+
+      {/* 📰 Top News Section */}
+      {topHeadlines.length > 0 ? (
+        <TopNews articles={topHeadlines} />
+      ) : (
+        <p className="text-center text-yellow-600 font-semibold">
+          ⚠️ No top news articles found.
+        </p>
+      )}
+
+      {/* 🔥 Trending Now Section */}
+      <TrendingStories articles={topHeadlines} />
+    </section>
   );
 }
 
 export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general');
-
-  const topHeadlines = filterArticlesByRegion(allArticles, 'gujarat'); // 👈 change for india/international
+  const topHeadlines = await fetchTopNewswithAutoKey('general');
 
   return {
     props: {
@@ -26,4 +37,3 @@ export async function getStaticProps() {
     revalidate: 1800,
   };
 }
-
