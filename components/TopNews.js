@@ -1,5 +1,6 @@
+// components/TopNews.js
 import { useEffect, useState } from 'react';
-import { fetchTopNewsByCategory } from '../lib/fetchTopNews'; // ✅ Correct import
+import { fetchTopNewsByCategory } from '../lib/fetchTopNews';
 
 const categories = ['general', 'business', 'entertainment', 'science'];
 
@@ -12,6 +13,7 @@ export default function TopNews() {
     setLoading(true);
     fetchTopNewsByCategory(selected)
       .then(data => {
+        console.log('✅ NewsAPI Response:', data);
         setNews(data);
         setLoading(false);
       })
@@ -19,8 +21,8 @@ export default function TopNews() {
   }, [selected]);
 
   return (
-    <div>
-      {/* ✅ Category Buttons */}
+    <div className="mt-6">
+      {/* 🔘 Category Buttons */}
       <div className="flex flex-wrap gap-2 mb-6">
         {categories.map(cat => (
           <button
@@ -37,21 +39,21 @@ export default function TopNews() {
         ))}
       </div>
 
-      {/* ✅ News Card Section */}
+      {/* 📰 News Cards */}
       {loading ? (
-        <p className="text-gray-500 text-center animate-pulse">Loading...</p>
+        <p className="text-center text-gray-500 animate-pulse">Loading top news...</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto snap-x">
-          {news.map((article, i) => (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {news.map((article, index) => (
             <div
-              key={i}
-              className="bg-white rounded-xl shadow-md p-4 snap-start animate-pulse-on-load hover:shadow-lg transition duration-300"
+              key={index}
+              className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition duration-300 animate-pulse-on-load"
             >
-              <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 mb-2">
-                <a href={article.url} target="_blank" rel="noopener noreferrer">
+              <a href={article.url} target="_blank" rel="noopener noreferrer">
+                <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 line-clamp-2 mb-2">
                   {article.title}
-                </a>
-              </h3>
+                </h3>
+              </a>
               <p className="text-sm text-gray-500">{article.source.name}</p>
             </div>
           ))}
