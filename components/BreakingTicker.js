@@ -22,3 +22,4 @@ const BreakingTicker = () => {
 };
 
 export default BreakingTicker;
+
