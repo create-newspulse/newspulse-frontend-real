@@ -1,5 +1,5 @@
 import TopNews from '../components/TopNews';
-import { fetchTopNewsWithAutoKey } from '../lib/fetchTopNewsAuto'; // ✅ Auto-switch logic
+import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto'; // ✅ Auto-switch logic
 
 export default function Home({ topHeadlines }) {
   return (
@@ -10,7 +10,7 @@ export default function Home({ topHeadlines }) {
       <section className="bg-gray-100 p-4 rounded-xl">
         <h2 className="text-xl font-semibold mb-2">🌍 Trending Categories</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-          {/* Optional: Add category links or buttons here */}
+          {/* You can populate categories here */}
         </div>
       </section>
     </section>
@@ -18,12 +18,4 @@ export default function Home({ topHeadlines }) {
 }
 
 export async function getStaticProps() {
-  const topHeadlines = await fetchTopNewsWithAutoKey('top');
-
-  return {
-    props: {
-      topHeadlines,
-    },
-    revalidate: 3600, // Optional: Regenerate every hour
-  };
-}
+  const topHeadlines = await fetchTopNewswithAutoKey('top'); // ✅ Uses rotating keys
