@@ -1,4 +1,4 @@
-// components/WebStories.js
+import WebStories from '../components/WebStories';// components/WebStories.js
 const WebStories = ({ stories }) => (
     <section className="mt-6 px-4">
       <h2 className="text-xl font-bold mb-3">📲 Web Stories</h2>
