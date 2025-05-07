@@ -1,0 +1,8 @@
+import Image from 'next/image';
+
+<Image
+  src={article.urlToImage || '/fallback.jpg'}
+  alt={article.title || 'News image'}
+  fill
+  className="rounded-md object-cover"
+/>
