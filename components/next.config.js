@@ -1,16 +1,6 @@
 // next.config.js
 module.exports = {
   images: {
-    domains: [
-      'static.toiimg.com',
-      'cdn.cnn.com',
-      'ichef.bbci.co.uk',
-      'media.guim.co.uk',
-      'images.unsplash.com',
-      'i.ndtvimg.com',
-      'www.livemint.com',
-      's.yimg.com',
-      'img.etimg.com'
-    ],
+    domains: ['cdn.cnn.com', 'static.toiimg.com', 'images.unsplash.com', 'newsapi.org', 'media.newspulse.co.in'],
   },
 };
