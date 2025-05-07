@@ -16,3 +16,4 @@ export function filterArticlesByRegion(articles, region) {
     }))
     .filter(article => priorities.includes(article.language));
 }
+
