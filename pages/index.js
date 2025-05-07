@@ -1,5 +1,5 @@
 import TopNews from '../components/TopNews';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto'; // ✅ Correct filename
+import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
 
 export default function Home({ topHeadlines }) {
   return (
@@ -10,7 +10,7 @@ export default function Home({ topHeadlines }) {
       <section className="bg-gray-100 p-4 rounded-xl">
         <h2 className="text-xl font-semibold mb-2">🌍 Trending Categories</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-          {/* You can populate categories here */}
+          {/* Add category buttons/cards if needed */}
         </div>
       </section>
     </section>
@@ -18,12 +18,13 @@ export default function Home({ topHeadlines }) {
 }
 
 export async function getStaticProps() {
-  const topHeadlines = await fetchTopNewswithAutoKey('top'); // ✅ Uses rotating keys
+  const topHeadlines = await fetchTopNewswithAutoKey('general');
+  console.log('✅ Filtered top headlines:', topHeadlines.length);
 
   return {
     props: {
       topHeadlines,
     },
-    revalidate: 1800, // 🔁 Optional: ISR refreshes every 30 mins
+    revalidate: 1800,
   };
 }
