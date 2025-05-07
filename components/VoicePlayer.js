@@ -1,3 +1,4 @@
+import VoicePlayer from '../components/VoicePlayer';
 // components/VoicePlayer.js
 import { useEffect, useRef } from 'react';
 
