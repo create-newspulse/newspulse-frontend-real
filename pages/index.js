@@ -1,5 +1,5 @@
 import TopNews from '../components/TopNews';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto'; // ✅ Auto-switch logic
+import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto'; // ✅ Correct filename
 
 export default function Home({ topHeadlines }) {
   return (
@@ -19,3 +19,11 @@ export default function Home({ topHeadlines }) {
 
 export async function getStaticProps() {
   const topHeadlines = await fetchTopNewswithAutoKey('top'); // ✅ Uses rotating keys
+
+  return {
+    props: {
+      topHeadlines,
+    },
+    revalidate: 1800, // 🔁 Optional: ISR refreshes every 30 mins
+  };
+}
