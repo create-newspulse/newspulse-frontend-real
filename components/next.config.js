@@ -1,7 +1,10 @@
-// next.config.js
 module.exports = {
-    images: {
-      domains: ['cdn.cnn.com', 'static.toiimg.com', 'images.unsplash.com', 'newsapi.org', 'media.newspulse.co.in'],
-    },
-  };
-  
+  images: {
+    domains: [
+      'www.tribuneindia.com',
+      'devdiscourse.blob.core.windows.net',
+      'resize.indiatvnews.com',
+      'cdn.newsdataset.com', // add more if needed
+    ],
+  },
+}
