@@ -1,5 +1,5 @@
 import TopNews from '../components/TopNews';
-import { fetchTopNewsByCategory } from '../lib/fetchTopNews'; // make sure this file exists
+import { fetchTopNewsByCategory } from '../lib/fetchTopNews';
 
 export default function Home({ topHeadlines }) {
   return (
@@ -18,7 +18,11 @@ export default function Home({ topHeadlines }) {
 }
 
 export async function getStaticProps() {
-  const topHeadlines = await fetchTopNewsByCategory('general'); // or 'technology', 'business', etc.
+  const topHeadlines = await fetchTopNewsByCategory('general');
+
+  // ✅ Safe to log here
+  console.log("📰 topHeadlines fetched:", topHeadlines?.length || 0);
+
   return {
     props: {
       topHeadlines,
