@@ -1,10 +1,18 @@
+/* 🧠 Must-have Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ✅ Custom utility with animation */
 @layer utilities {
   .animate-pulse-on-load {
     animation: fadeInUp 0.6s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse-on-load {
+      animation: none;
+    }
   }
 
   @keyframes fadeInUp {
