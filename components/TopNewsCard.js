@@ -1,31 +1,42 @@
 import Image from 'next/image';
 
-const TopNewsCard = ({ article }) => {
-  const { title, description, urlToImage, language = 'en' } = article;
+export default function TopNewsCard({ article }) {
+  const { title, urlToImage, description, source, publishedAt, language = 'en' } = article;
 
-  const langColor = {
-    gu: '🟢 Gujarati',
-    hi: '🔵 Hindi',
-    en: '🔴 English',
+  const langMap = {
+    gu: { badge: '🟢 Gujarati', color: 'bg-green-100 text-green-800' },
+    hi: { badge: '🔵 Hindi', color: 'bg-blue-100 text-blue-800' },
+    en: { badge: '🔴 English', color: 'bg-red-100 text-red-800' },
   };
 
+  const lang = title.match(/[\u0A80-\u0AFF]/) ? 'gu'
+              : title.match(/[\u0900-\u097F]/) ? 'hi' : 'en';
+
+  const langProps = langMap[lang] || langMap.en;
+
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-4 flex flex-col gap-2 border border-gray-100">
-      <div className="relative w-full h-40 overflow-hidden rounded-md">
+    <div className="bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border">
+      <div className="relative h-[200px] w-full">
         <Image
           src={urlToImage || '/fallback.jpg'}
           alt={title}
-          fill
-          className="object-cover"
+          layout="fill"
+          objectFit="cover"
+          className="rounded-t-xl"
         />
       </div>
-      <h3 className="font-bold text-lg line-clamp-2">{title}</h3>
-      <p className="text-sm text-gray-600 line-clamp-3">{description}</p>
-      <span className="text-xs mt-2 font-medium">
-        {langColor[language] || '🌐 Unlabeled'}
-      </span>
+
+      <div className="p-4 space-y-2">
+        <span className={`text-xs px-2 py-1 rounded-full font-medium ${langProps.color}`}>
+          {langProps.badge}
+        </span>
+        <h2 className="text-md font-semibold line-clamp-2">{title}</h2>
+        <p className="text-sm text-gray-600 line-clamp-3">{description}</p>
+        <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
+          <span>{source?.name || 'Unknown Source'}</span>
+          <span>{new Date(publishedAt).toLocaleDateString()}</span>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default TopNewsCard;
+}
