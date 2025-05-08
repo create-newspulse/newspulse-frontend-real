@@ -1,54 +1,47 @@
+// ✅ pages/index.js (Homepage)
 
-// pages/index.js
-import Head from 'next/head';
+import { useLanguage } from '../utils/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import fetchTopNewsAuto from '../lib/fetchTopNewsAuto';
+import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
 
-export async function getServerSideProps() {
-  const topHeadlines = await fetchTopNewsAuto(); // Auto-updating API
-  return { props: { topHeadlines } };
-}
+export default function HomePage({ topHeadlines }) {
+  const { language } = useLanguage();
 
-export default function Home({ topHeadlines }) {
   return (
     <>
-      <Head>
-        <title>Gujarat News Pulse</title>
-        <meta name="description" content="Latest breaking news from Gujarat, India and around the world." />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      {/* 🔴 Breaking News Ticker */}
       <BreakingTicker />
+      <LanguageToggle />
+      <main className={`p-4 sm:p-6 lg:p-8 space-y-10 font-${language}`}>
+        <h1 className="text-4xl font-bold text-center text-blue-700">
+          🌍 Welcome to News Pulse
+        </h1>
 
-      {/* ✅ Hero Title */}
-      <div className="flex justify-center items-center gap-2 mt-6">
-        <span className="text-green-600 text-3xl font-bold">●</span>
-        <h1 className="text-3xl font-bold">Gujarat News Pulse</h1>
-      </div>
+        {topHeadlines.length > 0 ? (
+          <TopNews articles={topHeadlines} />
+        ) : (
+          <p className="text-center text-yellow-600 font-medium">
+            ⚠️ No news available right now.
+          </p>
+        )}
 
-      {/* ⚠️ No Articles Fallback */}
-      {topHeadlines?.length === 0 && (
-        <div className="text-orange-600 font-medium text-center mt-4">⚠️ No top news available right now.</div>
-      )}
-
-      {/* 🗞 Top News Cards */}
-      <div className="px-4 md:px-8 mt-10">
-        <TopNews articles={topHeadlines} />
-      </div>
-
-      {/* 📈 Trending Now Block */}
-      <div className="px-4 md:px-8 mt-10">
         <TrendingNow />
-      </div>
-
-      {/* 📚 Web Stories */}
-      <div className="px-4 md:px-8 mt-10 mb-10">
         <WebStories />
-      </div>
+      </main>
     </>
   );
+}
+
+export async function getStaticProps() {
+  const allArticles = await fetchTopNewswithAutoKey('general');
+
+  return {
+    props: {
+      topHeadlines: allArticles || [],
+    },
+    revalidate: 1800,
+  };
 }
