@@ -1,3 +1,4 @@
+// ✅ Home Page – Gujarat News Pulse (Multilingual)
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
@@ -7,7 +8,7 @@ import WebStories from '../components/WebStories';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import Head from 'next/head';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto';
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ Default import
 
 export default function Home({ topHeadlines }) {
   const { language } = useLanguage();
@@ -25,14 +26,12 @@ export default function Home({ topHeadlines }) {
         <BreakingTicker />
         <LanguageToggle />
 
-        {/* 🟢 Dynamic Heading */}
         <h1 className="text-3xl sm:text-4xl font-bold text-center text-green-700 mt-6">
           🟢 Gujarat News Pulse (
           {language === 'gujarati' ? 'ગુજરાતી' : language === 'hindi' ? 'हिन्दी' : 'English'})
         </h1>
 
-        {/* ⚠️ Fallback */}
-        {topHeadlines.length > 0 ? (
+        {topHeadlines?.length > 0 ? (
           <>
             <TopNews articles={topHeadlines} />
             <TrendingNow />
@@ -51,11 +50,18 @@ export default function Home({ topHeadlines }) {
 }
 
 export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general');
-  return {
-    props: {
-      topHeadlines: allArticles || [],
-    },
-    revalidate: 1800,
-  };
+  try {
+    const allArticles = await fetchTopNewswithAutoKey('general');
+    return {
+      props: {
+        topHeadlines: allArticles || [],
+      },
+      revalidate: 1800,
+    };
+  } catch (error) {
+    console.error('❌ Failed to fetch homepage news:', error);
+    return {
+      props: { topHeadlines: [] },
+    };
+  }
 }
