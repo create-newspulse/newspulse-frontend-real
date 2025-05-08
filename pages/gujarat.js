@@ -10,6 +10,13 @@ import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
+import { useLanguage } from '../utils/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
+
+const { language } = useLanguage();
+...
+<LanguageToggle />
+<main className={`font-${language}`}>...</main>
 
 // Use same imports as above...
 
