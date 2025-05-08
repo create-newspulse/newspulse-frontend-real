@@ -1,10 +1,9 @@
-// pages/india.js
-
+// ✅ pages/india.js
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ Use default import if it's exported as default
+import fetchTopNewsAuto from '../lib/fetchTopNewsAuto'; // ✅ Use default export
 
 export default function IndiaNews({ topHeadlines }) {
   return (
@@ -16,7 +15,7 @@ export default function IndiaNews({ topHeadlines }) {
           🔵 India News Pulse
         </h1>
 
-        {topHeadlines && topHeadlines.length > 0 ? (
+        {topHeadlines?.length > 0 ? (
           <TopNews articles={topHeadlines} />
         ) : (
           <p className="text-center text-yellow-600 font-medium">
@@ -31,22 +30,18 @@ export default function IndiaNews({ topHeadlines }) {
   );
 }
 
-// ✅ Use getServerSideProps for better freshness or fallback support
-export async function getServerSideProps() {
+// ✅ Static props using default fetch
+export async function getStaticProps() {
   try {
-    const allArticles = await fetchTopNewswithAutoKey('general');
-
+    const topHeadlines = await fetchTopNewsAuto('general');
     return {
-      props: {
-        topHeadlines: allArticles || [],
-      },
+      props: { topHeadlines },
+      revalidate: 1800, // Rebuild every 30 mins
     };
   } catch (error) {
-    console.error('❌ IndiaNews fetch error:', error);
+    console.error('❌ Error in getStaticProps:', error.message);
     return {
-      props: {
-        topHeadlines: [],
-      },
+      props: { topHeadlines: [] },
     };
   }
 }
