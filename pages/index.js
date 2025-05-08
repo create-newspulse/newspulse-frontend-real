@@ -1,3 +1,4 @@
+
 // pages/index.js
 import Head from 'next/head';
 import BreakingTicker from '../components/BreakingTicker';
