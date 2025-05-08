@@ -1,15 +1,6 @@
-import { useLanguage } from '../utils/LanguageContext';
-import LanguageToggle from '../components/LanguageToggle';
-import BreakingTicker from '../components/BreakingTicker';
-import TopNews from '../components/TopNews';
-import TrendingNow from '../components/TrendingNow';
-import WebStories from '../components/WebStories';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
-
-const { language } = useLanguage();
-...
-<LanguageToggle />
-<main className={`font-${language}`}>...</main>
+<h1 className="text-4xl font-bold text-center text-green-600">
+  🟢 Gujarat News Pulse ({language === 'gujarati' ? 'ગુજરાતી' : language === 'hindi' ? 'हिन्दी' : 'English'})
+</h1>
 
 // Use same imports as above...
 
