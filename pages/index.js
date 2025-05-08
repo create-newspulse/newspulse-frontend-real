@@ -1,47 +1,49 @@
-// ✅ pages/index.js (Homepage)
-
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
+import NavBar from '../components/NavBar';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
+import Footer from '../components/Footer';
+import fetchTopNewsAuto from '../lib/fetchTopNewsAuto';
 
-export default function HomePage({ topHeadlines }) {
+export default function Home({ topHeadlines }) {
   const { language } = useLanguage();
 
   return (
     <>
+      <NavBar />
       <BreakingTicker />
       <LanguageToggle />
+
       <main className={`p-4 sm:p-6 lg:p-8 space-y-10 font-${language}`}>
-        <h1 className="text-4xl font-bold text-center text-blue-700">
-          🌍 Welcome to News Pulse
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-green-700">
+          🟢 Gujarat News Pulse ({language === 'gujarati' ? 'ગુજરાતી' : language === 'hindi' ? 'हिन्दी' : 'English'})
         </h1>
 
         {topHeadlines.length > 0 ? (
-          <TopNews articles={topHeadlines} />
+          <>
+            <TopNews articles={topHeadlines} />
+            <TrendingNow />
+            <WebStories />
+          </>
         ) : (
-          <p className="text-center text-yellow-600 font-medium">
-            ⚠️ No news available right now.
+          <p className="text-orange-600 font-medium mt-6 text-center">
+            ⚠️ No top news available right now.
           </p>
         )}
-
-        <TrendingNow />
-        <WebStories />
       </main>
+
+      <Footer />
     </>
   );
 }
 
 export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general');
-
+  const topHeadlines = await fetchTopNewsAuto('general');
   return {
-    props: {
-      topHeadlines: allArticles || [],
-    },
+    props: { topHeadlines: topHeadlines || [] },
     revalidate: 1800,
   };
 }
