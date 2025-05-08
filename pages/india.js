@@ -3,10 +3,12 @@ import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import fetchTopNewsAuto from '../lib/fetchTopNewsAuto'; // ✅ Use default export
+import fetchTopNewsAuto from '../lib/fetchTopNewsAuto'; // default import
 
-export default function IndiaNews({ topHeadlines }) {
-  return (
+export async function getStaticProps() {
+  const topHeadlines = await fetchTopNewsAuto('general');
+  return { props: { topHeadlines }, revalidate: 1800 };
+}
     <>
       <BreakingTicker />
 
