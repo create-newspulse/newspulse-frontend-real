@@ -1,19 +1,36 @@
+// pages/index.js
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
-import { filterArticlesByRegion } from '../utils/filterArticlesByRegion';
 
 export default function Home({ topHeadlines }) {
   return (
     <>
       <BreakingTicker />
-      <main className="p-6 space-y-10">
-        <h1 className="text-3xl font-bold text-center">
+
+      <main className="p-4 sm:p-6 lg:p-8 space-y-10">
+        {/* Header */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-green-700">
           🟢 Gujarat News Pulse
         </h1>
-        <TopNews articles={topHeadlines} />
+
+        {/* Top News Grid */}
+        {topHeadlines.length > 0 ? (
+          <TopNews articles={topHeadlines} />
+        ) : (
+          <p className="text-center text-yellow-600 font-medium">
+            ⚠️ No top news available right now.
+          </p>
+        )}
+
+        {/* Trending Now Section */}
         <TrendingNow />
+
+        {/* ✅ Web Stories Placeholder */}
+        <section className="bg-slate-50 border rounded-lg p-4 text-center text-gray-500 italic">
+          ⚙️ Web Stories block coming next...
+        </section>
       </main>
     </>
   );
@@ -21,12 +38,11 @@ export default function Home({ topHeadlines }) {
 
 export async function getStaticProps() {
   const allArticles = await fetchTopNewswithAutoKey('general');
-  const topHeadlines = filterArticlesByRegion(allArticles, 'gujarat');
 
   return {
     props: {
-      topHeadlines,
+      topHeadlines: allArticles || [],
     },
-    revalidate: 1800,
+    revalidate: 1800, // Revalidate every 30 min
   };
 }
