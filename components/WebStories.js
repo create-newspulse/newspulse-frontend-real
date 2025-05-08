@@ -13,7 +13,7 @@ const sampleStories = [
     link: '#',
   },
   {
-    title: '📉 How India Beat Inflation: Explained Visually',
+    title: '📈 How India Beat Inflation: Explained Visually',
     image: '/india-inflation.jpg',
     link: '#',
   },
@@ -36,12 +36,13 @@ const WebStories = () => {
             href={story.link}
             className="min-w-[180px] max-w-[200px] bg-white border rounded-lg shadow hover:shadow-md transition"
           >
-            <div className="relative h-36 w-full">
+            <div className="w-full">
               <Image
                 src={story.image}
                 alt={story.title}
-                layout="fill"
-                className="rounded-t-lg object-cover"
+                width={300}
+                height={180}
+                className="rounded-t-lg object-cover w-full h-full"
               />
             </div>
             <div className="p-2 text-sm font-medium line-clamp-2">{story.title}</div>
