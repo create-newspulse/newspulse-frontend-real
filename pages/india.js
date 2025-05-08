@@ -5,10 +5,8 @@ import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
 import fetchTopNewsAuto from '../lib/fetchTopNewsAuto'; // default import
 
-export async function getStaticProps() {
-  const topHeadlines = await fetchTopNewsAuto('general');
-  return { props: { topHeadlines }, revalidate: 1800 };
-}
+export default function IndiaNews({ topHeadlines }) {
+  return (
     <>
       <BreakingTicker />
 
@@ -38,7 +36,7 @@ export async function getStaticProps() {
     const topHeadlines = await fetchTopNewsAuto('general');
     return {
       props: { topHeadlines },
-      revalidate: 1800, // Rebuild every 30 mins
+      revalidate: 1800, // Rebuild every 30 minutes
     };
   } catch (error) {
     console.error('❌ Error in getStaticProps:', error.message);
