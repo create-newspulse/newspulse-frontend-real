@@ -1,13 +1,19 @@
 // ✅ pages/india.js
+import Head from 'next/head';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import fetchTopNewsAuto from '../lib/fetchTopNewsAuto'; // default import
+import fetchTopNewsAuto from '../lib/fetchTopNewsAuto'; // ✅ default import
 
 export default function IndiaNews({ topHeadlines }) {
   return (
     <>
+      <Head>
+        <title>India News Pulse</title>
+        <meta name="description" content="Live headlines from India. National news powered by News Pulse." />
+      </Head>
+
       <BreakingTicker />
 
       <main className="p-4 sm:p-6 lg:p-8 space-y-10">
@@ -30,13 +36,13 @@ export default function IndiaNews({ topHeadlines }) {
   );
 }
 
-// ✅ Static props using default fetch
+// ✅ Static props using correct default fetch
 export async function getStaticProps() {
   try {
-    const topHeadlines = await fetchTopNewsAuto('general');
+    const topHeadlines = await fetchTopNewsAuto('general'); // ✅ matches default import
     return {
       props: { topHeadlines },
-      revalidate: 1800, // Rebuild every 30 minutes
+      revalidate: 1800, // 30 minutes
     };
   } catch (error) {
     console.error('❌ Error in getStaticProps:', error.message);
