@@ -1,14 +1,15 @@
-// components/LanguageToggle.js
 import { useLanguage } from '../utils/LanguageContext';
 
-export default function LanguageToggle() {
+const LanguageToggle = () => {
   const { language, setLanguage } = useLanguage();
 
   return (
-    <div className="flex justify-center my-4 space-x-3">
-      <button onClick={() => setLanguage('english')} className="px-3 py-1 border rounded bg-white hover:bg-gray-200">🌐 English</button>
-      <button onClick={() => setLanguage('hindi')} className="px-3 py-1 border rounded bg-white hover:bg-gray-200">🇮🇳 हिन्दी</button>
-      <button onClick={() => setLanguage('gujarati')} className="px-3 py-1 border rounded bg-white hover:bg-gray-200">🇬🇮 ગુજરાતી</button>
+    <div className="text-center space-x-4 py-2">
+      <button onClick={() => setLanguage('gujarati')} className="text-green-700">Gujarati</button>
+      <button onClick={() => setLanguage('hindi')} className="text-red-600">Hindi</button>
+      <button onClick={() => setLanguage('english')} className="text-blue-600">English</button>
     </div>
   );
-}
+};
+
+export default LanguageToggle;
