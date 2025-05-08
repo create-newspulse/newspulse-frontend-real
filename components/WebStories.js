@@ -37,12 +37,10 @@ const WebStories = () => {
             className="min-w-[180px] max-w-[200px] bg-white border rounded-lg shadow hover:shadow-md transition"
           >
             <div className="w-full">
-              <Image
+              <img
                 src={story.image}
                 alt={story.title}
-                width={300}
-                height={180}
-                className="rounded-t-lg object-cover w-full h-full"
+                className="rounded-t-lg object-cover w-full h-[180px]"
               />
             </div>
             <div className="p-2 text-sm font-medium line-clamp-2">{story.title}</div>
@@ -52,5 +50,3 @@ const WebStories = () => {
     </section>
   );
 };
-
-export default WebStories;
