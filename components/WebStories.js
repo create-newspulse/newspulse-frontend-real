@@ -4,22 +4,22 @@ import Image from 'next/image';
 const sampleStories = [
   {
     title: '🧠 AI Explains Budget 2024 in 60 Seconds',
-    image: '/stories/ai-budget.jpg',
+    image: '/ai-budget-2024.jpg',
     link: '#',
   },
   {
     title: '🚀 ISRO Launches India’s First Space Lab',
-    image: '/stories/isro-launch.jpg',
+    image: '/isro-launch.jpg',
     link: '#',
   },
   {
-    title: '📈 How India Beat Inflation: Explained Visually',
-    image: '/stories/inflation-chart.jpg',
+    title: '📉 How India Beat Inflation: Explained Visually',
+    image: '/india-inflation.jpg',
     link: '#',
   },
   {
     title: '🎬 Behind the Scenes of “Ramayana 2025”',
-    image: '/stories/ramayana.jpg',
+    image: '/ramayana-2025.jpg',
     link: '#',
   },
 ];
