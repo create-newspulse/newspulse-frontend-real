@@ -1,8 +1,10 @@
+// pages/india.js
+
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ Use default import if it's exported as default
 
 export default function IndiaNews({ topHeadlines }) {
   return (
@@ -14,7 +16,7 @@ export default function IndiaNews({ topHeadlines }) {
           🔵 India News Pulse
         </h1>
 
-        {topHeadlines.length > 0 ? (
+        {topHeadlines && topHeadlines.length > 0 ? (
           <TopNews articles={topHeadlines} />
         ) : (
           <p className="text-center text-yellow-600 font-medium">
@@ -29,13 +31,22 @@ export default function IndiaNews({ topHeadlines }) {
   );
 }
 
-export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general');
+// ✅ Use getServerSideProps for better freshness or fallback support
+export async function getServerSideProps() {
+  try {
+    const allArticles = await fetchTopNewswithAutoKey('general');
 
-  return {
-    props: {
-      topHeadlines: allArticles || [],
-    },
-    revalidate: 1800,
-  };
+    return {
+      props: {
+        topHeadlines: allArticles || [],
+      },
+    };
+  } catch (error) {
+    console.error('❌ IndiaNews fetch error:', error);
+    return {
+      props: {
+        topHeadlines: [],
+      },
+    };
+  }
 }
