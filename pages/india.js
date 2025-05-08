@@ -13,10 +13,13 @@ export default function IndiaNews({ topHeadlines }) {
     <>
       <BreakingTicker />
       <LanguageToggle />
+
       <main className={`p-4 sm:p-6 lg:p-8 space-y-10 font-${language}`}>
         <h1 className="text-4xl font-bold text-center text-blue-700">
-          🔵 India News Pulse (हिन्दी)
+          🔵 India News Pulse (
+          {language === 'gujarati' ? 'ગુજરાતી' : language === 'hindi' ? 'हिन्दी' : 'English'})
         </h1>
+
         {topHeadlines.length > 0 ? (
           <TopNews articles={topHeadlines} />
         ) : (
@@ -24,6 +27,7 @@ export default function IndiaNews({ topHeadlines }) {
             ⚠️ No news available right now.
           </p>
         )}
+
         <TrendingNow />
         <WebStories />
       </main>
