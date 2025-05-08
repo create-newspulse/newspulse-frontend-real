@@ -2,6 +2,7 @@
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
+import WebStories from '../components/WebStories'; // ✅ Web Stories Block
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
 
 export default function Home({ topHeadlines }) {
@@ -27,10 +28,8 @@ export default function Home({ topHeadlines }) {
         {/* Trending Now Section */}
         <TrendingNow />
 
-        {/* ✅ Web Stories Placeholder */}
-        <section className="bg-slate-50 border rounded-lg p-4 text-center text-gray-500 italic">
-          ⚙️ Web Stories block coming next...
-        </section>
+        {/* ✅ Web Stories Section */}
+        <WebStories />
       </main>
     </>
   );
