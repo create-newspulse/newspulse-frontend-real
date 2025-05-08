@@ -1,4 +1,5 @@
 // pages/index.js
+
 import Head from 'next/head';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
@@ -42,9 +43,8 @@ export default function Home({ topHeadlines }) {
   );
 }
 
-// ✅ Server-side fetching
 export async function getServerSideProps() {
-  const topHeadlines = await fetchTopNewsAuto(); // category: 'general' by default
+  const topHeadlines = await fetchTopNewsAuto(); // auto-updated news
   return {
     props: {
       topHeadlines,
