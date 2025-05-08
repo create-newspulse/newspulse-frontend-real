@@ -1,6 +1,3 @@
-// components/WebStories.js
-import Image from 'next/image';
-
 const sampleStories = [
   {
     title: '🧠 AI Explains Budget 2024 in 60 Seconds',
@@ -50,3 +47,5 @@ const WebStories = () => {
     </section>
   );
 };
+
+export default WebStories;
