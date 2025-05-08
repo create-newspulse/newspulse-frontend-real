@@ -56,3 +56,4 @@ const TopNewsCard = ({ article }) => {
 };
 
 export default TopNewsCard;
+
