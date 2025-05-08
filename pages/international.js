@@ -5,11 +5,6 @@ import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
-import BreakingTicker from '../components/BreakingTicker';
-import TopNews from '../components/TopNews';
-import TrendingNow from '../components/TrendingNow';
-import WebStories from '../components/WebStories';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
 
 export default function WorldNews({ topHeadlines }) {
   return (
