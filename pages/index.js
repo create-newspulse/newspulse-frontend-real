@@ -14,7 +14,7 @@ const categories = [
   { name: "Business", icon: "📈" },
   { name: "Science", icon: "🔬" },
   { name: "Sports", icon: "🏏" },
-  { name: "Youth", icon: "🧑‍🎓" },
+  { name: "Youth", icon: "🎓" },
 ];
 
 export default function HomePage() {
@@ -28,20 +28,23 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#B71C1C] to-[#EF5350] text-white">
-      <div className="text-center py-8">
-        <h1 className="text-4xl font-bold">📢 News Pulse</h1>
+    <main className="min-h-screen bg-white text-black">
+      <div className="bg-gradient-to-r from-[#004AAD] to-[#2980B9] text-white text-center py-8 shadow-md">
+        <h1 className="text-4xl font-bold tracking-tight">News Pulse</h1>
         <p className="mt-2 text-lg italic">{taglines[taglineIndex]}</p>
       </div>
+      
       <BreakingTicker />
+
       <section className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-4 px-6">
         {categories.map((cat, i) => (
-          <div key={i} className="bg-white text-black p-4 rounded shadow text-center">
+          <div key={i} className="bg-white border border-gray-200 p-4 rounded shadow-sm text-center hover:shadow-md transition">
             <div className="text-3xl">{cat.icon}</div>
-            <h2 className="text-lg mt-2 font-semibold">{cat.name}</h2>
+            <h2 className="text-base mt-2 font-semibold">{cat.name}</h2>
           </div>
         ))}
       </section>
+
       <div className="fixed bottom-4 right-4">
         <VoiceButton />
       </div>
