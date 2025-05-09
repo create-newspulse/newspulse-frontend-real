@@ -4,7 +4,8 @@ import { createContext, useContext, useState } from 'react';
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState('gujarati');
+  const [language, setLanguage] = useState('gujarati'); // Default can be 'gujarati', 'hindi', or 'english'
+
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>
       {children}
