@@ -1,4 +1,4 @@
-import { useLanguage } from '../utils/LanguageContext'; // ✅
+import { useLanguage } from '../utils/LanguageContext'; // ✅ Correct
 import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
