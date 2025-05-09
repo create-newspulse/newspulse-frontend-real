@@ -3,17 +3,21 @@ import { useLanguage } from '../utils/LanguageContext';
 export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
 
+  const handleChange = (e) => {
+    const selected = e.target.value;
+    setLanguage(selected);
+    localStorage.setItem('lang', selected); // make sure it's remembered
+  };
+
   return (
-    <div className="text-center mt-4">
-      <select
-        value={language}
-        onChange={(e) => setLanguage(e.target.value)}
-        className="border rounded px-3 py-1"
-      >
-        <option value="english">English</option>
-        <option value="hindi">हिन्दी</option>
-        <option value="gujarati">ગુજરાતી</option>
-      </select>
-    </div>
+    <select
+      value={language}
+      onChange={handleChange}
+      className="border rounded p-2 text-base font-medium bg-white shadow"
+    >
+      <option value="english">🌐 English</option>
+      <option value="hindi">🔶 हिंदी</option>
+      <option value="gujarati">🟢 ગુજરાતી</option>
+    </select>
   );
 }
