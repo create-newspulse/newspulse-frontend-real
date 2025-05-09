@@ -1,7 +1,7 @@
 // pages/index.js
 
 import { useLanguage } from '../utils/LanguageContext'; // ✅
-import LanguageToggle from '../components/LanguageToggle'; // ✅ Dropdown/flags to switch
+import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
@@ -9,10 +9,10 @@ import WebStories from '../components/WebStories';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import Head from 'next/head';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ default import (no curly braces)
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅
 
 export default function Home({ topHeadlines }) {
-  const { language } = useLanguage(); // ✅ gets current language selection
+  const { language } = useLanguage();
 
   return (
     <>
@@ -56,6 +56,6 @@ export async function getStaticProps() {
     props: {
       topHeadlines: allArticles || [],
     },
-    revalidate: 1800, // Regenerates every 30 mins
+    revalidate: 1800,
   };
 }
