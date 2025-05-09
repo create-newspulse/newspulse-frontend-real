@@ -5,7 +5,6 @@ import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
 import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
-import { useLanguage } from '../utils/LanguageContext'; // ✅ Correct
 
 export default function GujaratNews({ topHeadlines }) {
   const { language } = useLanguage();
