@@ -1,23 +1,50 @@
-import { useLanguage } from '../utils/LanguageContext';
-import LanguageToggle from '../components/LanguageToggle';
+import { useEffect, useState } from 'react';
+import BreakingTicker from '../components/BreakingTicker';
+import VoiceButton from '../components/VoiceButton';
+
+const taglines = [
+  "Your pulse on what matters most.",
+  "ख़बरें जो दिलों की धड़कन बनें।",
+  "સમાચાર જે દિલને સ્પર્શે."
+];
+
+const categories = [
+  { name: "Politics", icon: "🗳️" },
+  { name: "Glamour", icon: "🌟" },
+  { name: "Business", icon: "📈" },
+  { name: "Science", icon: "🔬" },
+  { name: "Sports", icon: "🏏" },
+  { name: "Youth", icon: "🧑‍🎓" },
+];
 
 export default function HomePage() {
-  const { language } = useLanguage();
+  const [taglineIndex, setTaglineIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTaglineIndex((i) => (i + 1) % taglines.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <main className={`p-4 font-${language}`}>
-      <h1 className="text-4xl text-center font-bold text-green-700">
-        🏠 Welcome to News Pulse
-      </h1>
-      <p className="text-center mt-2 text-gray-600">
-        Explore news in Gujarati, Hindi, or English.
-      </p>
-      <LanguageToggle />
-      <ul className="mt-8 space-y-3 text-center">
-        <li><a href="/gujarat" className="text-blue-600 underline">🟢 Gujarati News</a></li>
-        <li><a href="/india" className="text-blue-600 underline">🔶 Hindi News</a></li>
-        <li><a href="/international" className="text-blue-600 underline">🔵 English News</a></li>
-      </ul>
+    <main className="min-h-screen bg-gradient-to-b from-[#B71C1C] to-[#EF5350] text-white">
+      <div className="text-center py-8">
+        <h1 className="text-4xl font-bold">📢 News Pulse</h1>
+        <p className="mt-2 text-lg italic">{taglines[taglineIndex]}</p>
+      </div>
+      <BreakingTicker />
+      <section className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-4 px-6">
+        {categories.map((cat, i) => (
+          <div key={i} className="bg-white text-black p-4 rounded shadow text-center">
+            <div className="text-3xl">{cat.icon}</div>
+            <h2 className="text-lg mt-2 font-semibold">{cat.name}</h2>
+          </div>
+        ))}
+      </section>
+      <div className="fixed bottom-4 right-4">
+        <VoiceButton />
+      </div>
     </main>
   );
 }
