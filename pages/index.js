@@ -1,6 +1,6 @@
 // pages/index.js
 
-import { useLanguage } from '../utils/LanguageContext'; // ✅ Hook to access selected language
+import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle'; // ✅ Dropdown/flags to switch
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
