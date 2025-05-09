@@ -1,5 +1,5 @@
 // ✅ Home Page – Gujarat News Pulse (Multilingual)
-import { useLanguage } from '../utils/LanguageContext';
+import { useLanguage } from '../utils/LanguageContext'; // ✅
 import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
