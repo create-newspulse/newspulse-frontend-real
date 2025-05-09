@@ -9,12 +9,12 @@ export default function GujaratNews() {
   const [topHeadlines, setTopHeadlines] = useState([]);
 
   useEffect(() => {
-    async function loadNews() {
-      const articles = await fetchTopNewswithAutoKey(language);
-      setTopHeadlines(articles);
-    }
-    loadNews();
-  }, [language]);
+  async function loadNews() {
+    const articles = await fetchTopNewswithAutoKey(language);
+    setTopHeadlines(articles);
+  }
+  loadNews();
+}, [language]); // 
 
   return (
     <>
