@@ -1,5 +1,7 @@
+// pages/_app.js
+
 import '../styles/globals.css';
-import { LanguageProvider } from '../utils/LanguageContext'; // ✅
+import { LanguageProvider } from '../utils/LanguageContext'; // ✅ Context for multilingual switch
 import Head from 'next/head';
 
 export default function MyApp({ Component, pageProps }) {
@@ -8,10 +10,12 @@ export default function MyApp({ Component, pageProps }) {
       <Head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {/* ✅ Load Hindi font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap"
           rel="stylesheet"
         />
+        {/* ✅ Gujarati font (Shruti) — system font */}
         <style>
           {`
             @font-face {
