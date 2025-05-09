@@ -10,7 +10,6 @@ import Footer from '../components/Footer';
 import Head from 'next/head';
 import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ No curly braces
 
-
 export default function Home({ topHeadlines }) {
   const { language } = useLanguage();
 
