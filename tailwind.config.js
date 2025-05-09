@@ -4,10 +4,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        hindi: ['"Noto Sans Devanagari"', 'sans-serif'],
+        english: ['Inter', 'sans-serif'],
+        hindi: ['Noto Sans Devanagari', 'sans-serif'],
         gujarati: ['Shruti', 'sans-serif'],
       },
     },
   },
   plugins: [],
-};
+}
