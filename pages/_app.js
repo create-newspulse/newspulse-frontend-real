@@ -3,7 +3,7 @@ import '../styles/globals.css';
 import Head from 'next/head';
 import { LanguageProvider } from '../utils/LanguageContext';
 
-export default function MyApp({ Component, pageProps }) {
+export default async function fetchTopNewswithAutoKey(category) { ... }
   return (
     <LanguageProvider>
       <Head>
