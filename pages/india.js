@@ -1,3 +1,5 @@
+// pages/india.js
+
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
@@ -41,6 +43,6 @@ export async function getStaticProps() {
     props: {
       topHeadlines: allArticles || [],
     },
-    revalidate: 1800,
+    revalidate: 1800, // Rebuild every 30 minutes
   };
 }
