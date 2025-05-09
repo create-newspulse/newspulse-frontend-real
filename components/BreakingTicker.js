@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
 const headlines = [
-  "🗞️ Budget 2025 highlights: Gujarat leads in solar push",
-  "🧠 AI Anchor teaser launches soon on News Pulse",
-  "🌐 Multilingual interface now live — EN, HI, GU",
-  "📱 News Pulse App announced for Android & iOS"
+  "PM visits Gujarat",
+  "ISRO's Gaganyaan enters Phase 2",
+  "Budget 2025 update released",
+  "AI tools shaping journalism"
 ];
 
 export default function BreakingTicker() {
@@ -18,7 +18,7 @@ export default function BreakingTicker() {
   }, []);
 
   return (
-    <div className="bg-black text-white text-sm sm:text-base px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap">
+    <div className="bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap">
       <span className="text-red-500 animate-pulse">🔴 LIVE</span>
       <span>{headlines[current]}</span>
     </div>
