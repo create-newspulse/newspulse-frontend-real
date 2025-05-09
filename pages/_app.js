@@ -1,6 +1,6 @@
 // pages/_app.js
 import '../styles/globals.css';
-import { LanguageProvider } from '../utils/LanguageContext'; // ✅ Make sure path is correct
+import { LanguageProvider } from '../utils/LanguageContext';
 import Head from 'next/head';
 
 export default function MyApp({ Component, pageProps }) {
@@ -13,12 +13,14 @@ export default function MyApp({ Component, pageProps }) {
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap"
           rel="stylesheet"
         />
-        <style>{`
-          @font-face {
-            font-family: 'Shruti';
-            src: local('Shruti');
-          }
-        `}</style>
+        <style>
+          {`
+            @font-face {
+              font-family: 'Shruti';
+              src: local('Shruti');
+            }
+          `}
+        </style>
       </Head>
       <Component {...pageProps} />
     </LanguageProvider>
