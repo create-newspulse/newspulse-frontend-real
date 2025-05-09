@@ -1,13 +1,15 @@
-import { useLanguage } from '../utils/LanguageContext'; // ✅
+// pages/gujarat.js
+
+import { useLanguage } from '../utils/LanguageContext'; // ✅ Language context hook
 import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ Default import
 
 export default function GujaratNews({ topHeadlines }) {
-  const { language } = useLanguage();
+  const { language } = useLanguage(); // ✅ Get current selected language
 
   return (
     <>
@@ -36,11 +38,11 @@ export default function GujaratNews({ topHeadlines }) {
 }
 
 export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general');
+  const allArticles = await fetchTopNewswithAutoKey('general'); // ✅ Fetch news
   return {
     props: {
       topHeadlines: allArticles || [],
     },
-    revalidate: 1800,
+    revalidate: 1800, // Rebuild every 30 minutes
   };
 }
