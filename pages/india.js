@@ -1,21 +1,19 @@
-// pages/india.js
-
+// pages/index.js (similar for gujarat.js, india.js, international.js)
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
 import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ No curly braces
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto';
 
-export default function IndiaNews({ topHeadlines }) {
+export default function Home({ topHeadlines }) {
   const { language } = useLanguage();
 
   return (
     <>
       <BreakingTicker />
       <LanguageToggle />
-
       <main className={`p-4 sm:p-6 lg:p-8 space-y-10 font-${language}`}>
         <h1 className="text-4xl font-bold text-center text-blue-700">
           🔵 India News Pulse (
