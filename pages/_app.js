@@ -1,29 +1,13 @@
 // pages/_app.js
 import '../styles/globals.css';
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />;
-}
-export default MyApp;
-import { LanguageProvider } from '../utils/LanguageContext';
+import { LanguageProvider } from '../utils/LanguageContext'; // ✅ import provider
 
-export default async function fetchTopNewswithAutoKey(category) { ... }
+function MyApp({ Component, pageProps }) {
   return (
-    <LanguageProvider>
-      <Head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap"
-          rel="stylesheet"
-        />
-        <style>{`
-          @font-face {
-            font-family: 'Shruti';
-            src: local('Shruti');
-          }
-        `}</style>
-      </Head>
+    <LanguageProvider> {/* ✅ wrap the entire app */}
       <Component {...pageProps} />
     </LanguageProvider>
   );
 }
+
+export default MyApp;
