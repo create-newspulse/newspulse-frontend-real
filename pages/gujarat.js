@@ -1,48 +1,44 @@
 // pages/gujarat.js
-
-import { useLanguage } from '../utils/LanguageContext'; // ✅ Language context hook
+import { useEffect, useState } from 'react';
+import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
-import BreakingTicker from '../components/BreakingTicker';
-import TopNews from '../components/TopNews';
-import TrendingNow from '../components/TrendingNow';
-import WebStories from '../components/WebStories';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ No curly braces
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto';
 
-export default function GujaratNews({ topHeadlines }) {
-  const { language } = useLanguage(); // ✅ Get current selected language
+export default function GujaratNews() {
+  const { language } = useLanguage();
+  const [topHeadlines, setTopHeadlines] = useState([]);
+
+  useEffect(() => {
+    async function loadNews() {
+      const articles = await fetchTopNewswithAutoKey(language);
+      setTopHeadlines(articles);
+    }
+    loadNews();
+  }, [language]);
 
   return (
     <>
-      <BreakingTicker />
       <LanguageToggle />
 
-      <main className={`p-4 sm:p-6 lg:p-8 space-y-10 font-${language}`}>
+      <main className={`p-4 sm:p-6 lg:p-8 font-${language}`}>
         <h1 className="text-4xl font-bold text-center text-green-700">
-          🟢 Gujarat News Pulse (
-          {language === 'gujarati' ? 'ગુજરાતી' : language === 'hindi' ? 'हिन्दी' : 'English'})
+          🟢 News Pulse — Gujarat | Hindi | English
         </h1>
 
         {topHeadlines.length > 0 ? (
-          <TopNews articles={topHeadlines} />
+          <ul className="mt-6 space-y-2">
+            {topHeadlines.map((article, index) => (
+              <li key={index}>
+                <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                  {article.title}
+                </a>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <p className="text-center text-yellow-600 font-medium">
-            ⚠️ No news available right now.
-          </p>
+          <p className="text-center text-yellow-600 mt-10">⚠️ No news available.</p>
         )}
-
-        <TrendingNow />
-        <WebStories />
       </main>
     </>
   );
-}
-
-export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general'); // ✅ Fetch news
-  return {
-    props: {
-      topHeadlines: allArticles || [],
-    },
-    revalidate: 1800, // Rebuild every 30 minutes
-  };
 }
