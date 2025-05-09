@@ -8,7 +8,7 @@ import WebStories from '../components/WebStories';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import Head from 'next/head';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ Default import
+import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto'; // ✅ Default import
 
 export default function Home({ topHeadlines }) {
   const { language } = useLanguage();
