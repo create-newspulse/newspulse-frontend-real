@@ -6,7 +6,7 @@ import BreakingTicker from '../components/BreakingTicker';
 import TopNews from '../components/TopNews';
 import TrendingNow from '../components/TrendingNow';
 import WebStories from '../components/WebStories';
-import { fetchTopNewswithAutoKey } from '../lib/fetchTopNewsAuto';
+import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto'; // ✅ No curly braces
 
 export default function InternationalNews({ topHeadlines }) {
   const { language } = useLanguage();
