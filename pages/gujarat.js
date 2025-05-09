@@ -10,7 +10,7 @@ export default function GujaratNews() {
 
   useEffect(() => {
   async function loadNews() {
-    const articles = await fetchTopNewswithAutoKey(language);
+    const articles = await fetchTopNewswithAutoKey(language); // ✅ pass language
     setTopHeadlines(articles);
   }
   loadNews();
