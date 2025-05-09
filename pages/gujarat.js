@@ -1,4 +1,3 @@
-// pages/gujarat.js
 import { useEffect, useState } from 'react';
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
@@ -9,17 +8,16 @@ export default function GujaratNews() {
   const [topHeadlines, setTopHeadlines] = useState([]);
 
   useEffect(() => {
-  async function loadNews() {
-    const articles = await fetchTopNewswithAutoKey(language); // ✅ pass language
-    setTopHeadlines(articles);
-  }
-  loadNews();
-}, [language]); // 
+    async function loadNews() {
+      const articles = await fetchTopNewswithAutoKey(language);
+      setTopHeadlines(articles);
+    }
+    loadNews();
+  }, [language]);
 
   return (
     <>
       <LanguageToggle />
-
       <main className={`p-4 sm:p-6 lg:p-8 font-${language}`}>
         <h1 className="text-4xl font-bold text-center text-green-700">
           🟢 News Pulse — Gujarat | Hindi | English

@@ -1,4 +1,3 @@
-// components/LanguageToggle.js
 import { useLanguage } from '../utils/LanguageContext';
 
 export default function LanguageToggle() {
