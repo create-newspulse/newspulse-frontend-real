@@ -4,29 +4,25 @@ import LanguageToggle from '../components/LanguageToggle';
 import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto';
 
 export default function GujaratNews() {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const [topHeadlines, setTopHeadlines] = useState([]);
 
   useEffect(() => {
-    async function loadNews() {
-      const articles = await fetchTopNewswithAutoKey(language);
-      setTopHeadlines(articles);
-    }
-    loadNews();
-  }, [language]);
+    setLanguage('gujarati');
+    fetchTopNewswithAutoKey('gujarati').then(setTopHeadlines);
+  }, []);
 
   return (
     <>
       <LanguageToggle />
-      <main className={`p-4 sm:p-6 lg:p-8 font-${language}`}>
+      <main className="p-4 font-gujarati">
         <h1 className="text-4xl font-bold text-center text-green-700">
-          🟢 News Pulse — Gujarat | Hindi | English
+          🟢 News Pulse – Gujarati
         </h1>
-
         {topHeadlines.length > 0 ? (
           <ul className="mt-6 space-y-2">
-            {topHeadlines.map((article, index) => (
-              <li key={index}>
+            {topHeadlines.map((article, i) => (
+              <li key={i}>
                 <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
                   {article.title}
                 </a>
@@ -34,7 +30,7 @@ export default function GujaratNews() {
             ))}
           </ul>
         ) : (
-          <p className="text-center text-yellow-600 mt-10">⚠️ No news available.</p>
+          <p className="text-yellow-600 text-center mt-10">⚠️ કોઈ સમાચાર ઉપલબ્ધ નથી.</p>
         )}
       </main>
     </>

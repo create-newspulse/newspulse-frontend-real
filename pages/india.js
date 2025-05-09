@@ -1,46 +1,38 @@
-// pages/index.js (similar for gujarat.js, india.js, international.js)
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
-import BreakingTicker from '../components/BreakingTicker';
-import TopNews from '../components/TopNews';
-import TrendingNow from '../components/TrendingNow';
-import WebStories from '../components/WebStories';
 import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto';
 
-export default function Home({ topHeadlines }) {
-  const { language } = useLanguage();
+export default function IndiaNews() {
+  const { language, setLanguage } = useLanguage();
+  const [topHeadlines, setTopHeadlines] = useState([]);
+
+  useEffect(() => {
+    setLanguage('hindi');
+    fetchTopNewswithAutoKey('hindi').then(setTopHeadlines);
+  }, []);
 
   return (
     <>
-      <BreakingTicker />
       <LanguageToggle />
-      <main className={`p-4 sm:p-6 lg:p-8 space-y-10 font-${language}`}>
-        <h1 className="text-4xl font-bold text-center text-blue-700">
-          🔵 India News Pulse (
-          {language === 'gujarati' ? 'ગુજરાતી' : language === 'hindi' ? 'हिन्दी' : 'English'})
+      <main className="p-4 font-hindi">
+        <h1 className="text-4xl font-bold text-center text-orange-700">
+          🔶 News Pulse – Hindi
         </h1>
-
         {topHeadlines.length > 0 ? (
-          <TopNews articles={topHeadlines} />
+          <ul className="mt-6 space-y-2">
+            {topHeadlines.map((article, i) => (
+              <li key={i}>
+                <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                  {article.title}
+                </a>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <p className="text-center text-yellow-600 font-medium">
-            ⚠️ No news available right now.
-          </p>
+          <p className="text-yellow-600 text-center mt-10">⚠️ कोई समाचार उपलब्ध नहीं है।</p>
         )}
-
-        <TrendingNow />
-        <WebStories />
       </main>
     </>
   );
-}
-
-export async function getStaticProps() {
-  const allArticles = await fetchTopNewswithAutoKey('general');
-  return {
-    props: {
-      topHeadlines: allArticles || [],
-    },
-    revalidate: 1800, // Rebuild every 30 minutes
-  };
 }
