@@ -1,6 +1,6 @@
 // pages/_app.js
 import '../styles/globals.css';
-import { LanguageProvider } from '../utils/LanguageContext'; // ✅ correct import
+import { LanguageProvider } from '../utils/LanguageContext'; // ✅ Make sure path is correct
 import Head from 'next/head';
 
 export default function MyApp({ Component, pageProps }) {
