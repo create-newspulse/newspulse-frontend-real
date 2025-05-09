@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 const headlines = [
-  "🔥 PM visits Gujarat for solar project launch",
   "🚀 ISRO's Gaganyaan enters Phase 2 successfully",
   "🧠 News Pulse launches voice-powered AI anchor",
   "📊 Budget 2025: Focus on digital journalism & youth"
