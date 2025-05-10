@@ -1,129 +1,183 @@
-// pages/index.js (without Tailwind)
-import Head from 'next/head';
-import BreakingTicker from '../components/BreakingTicker';
-import { useState, useEffect } from 'react';
-import '../styles/Index.css';
+// components/BreakingTicker.js (updated version from previous message)
+import { useEffect, useState, useCallback, useRef } from 'react';
 
-export default function Home() {
-  const [category, setCategory] = useState('');
-  const [featuredHeadlines, setFeaturedHeadlines] = useState([]);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+let tickerStyles = '';
+try {
+  tickerStyles = require('../styles/BreakingTicker.css');
+} catch (error) {
+  console.warn('BreakingTicker.css not found. Using fallback styles.');
+  tickerStyles = `
+    @keyframes slideIn {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-100%); opacity: 0; }
+    }
+    .ticker-enter {
+      animation: slideIn 0.5s ease-out forwards;
+    }
+    .ticker-exit {
+      animation: slideOut 0.5s ease-out forwards;
+    }
+  `;
+}
 
-  const fetchFeaturedHeadlines = async (selectedCategory, pageNum) => {
+const fetchHeadlines = async (category = '') => {
+  try {
+    const url = category ? `/api/headlines?category=${category}` : '/api/headlines';
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch headlines: ${response.statusText}`);
+    }
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid response format: Expected an array of headlines');
+    }
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch headlines:', error.message);
+    return [];
+  }
+};
+
+export default function BreakingTicker({
+  speed = 3500,
+  pauseOnHover = true,
+  className = '',
+  pollingInterval = 300000,
+  category = '',
+}) {
+  const [headlines, setHeadlines] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const intervalRef = useRef(null);
+  const pollingRef = useRef(null);
+  const retryCount = useRef(0);
+  const maxRetries = 3;
+
+  const loadHeadlines = useCallback(async () => {
     setIsLoading(true);
-    try {
-      const url = selectedCategory
-        ? `/api/headlines?category=${selectedCategory}&page=${pageNum}`
-        : `/api/headlines?page=${pageNum}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch featured headlines');
-      const data = await response.json();
-      if (pageNum === 1) {
-        setFeaturedHeadlines(data);
-      } else {
-        setFeaturedHeadlines((prev) => [...prev, ...data]);
-      }
-      setHasMore(data.length === 10);
-    } catch (error) {
-      console.error('Error fetching featured headlines:', error);
-      setFeaturedHeadlines([]);
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
+    const data = await fetchHeadlines(category);
+
+    if (data.length === 0 && retryCount.current < maxRetries) {
+      retryCount.current += 1;
+      console.warn(`Retry attempt ${retryCount.current}/${maxRetries} for fetching headlines`);
+      setTimeout(loadHeadlines, 5000 * retryCount.current);
+      return;
+    }
+
+    const validHeadlines = data.filter(
+      (headline) => headline && typeof headline.text === 'string' && headline.text.trim() !== ''
+    );
+
+    setHeadlines(validHeadlines);
+    setIsLoading(false);
+    setLastUpdated(new Date().toLocaleTimeString());
+    retryCount.current = 0;
+
+    if (validHeadlines.length === 0) {
+      setError('No valid headlines available');
+    } else {
+      setError(null);
+    }
+  }, [category]);
+
+  useEffect(() => {
+    loadHeadlines();
+    pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [loadHeadlines, pollingInterval]);
+
+  const startTicker = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = window.setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % (headlines.length || 1));
+    }, speed);
+  }, [speed, headlines.length]);
+
+  useEffect(() => {
+    if (headlines.length > 0 && !isPaused) {
+      startTicker();
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [headlines.length, isPaused, startTicker]);
+
+  const handleMouseEnter = () => {
+    if (pauseOnHover) setIsPaused(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (pauseOnHover) setIsPaused(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+      setIsPaused(!isPaused);
     }
   };
 
-  useEffect(() => {
-    fetchFeaturedHeadlines(category, page);
-  }, [category, page]);
+  if (isLoading && headlines.length === 0) {
+    return (
+      <div className={`bg-black text-white px-4 py-2 ${className}`}>
+        Loading headlines...
+      </div>
+    );
+  }
 
-  const handleLoadMore = () => {
-    setPage((prev) => prev + 1);
-  };
+  if (error && headlines.length === 0) {
+    return (
+      <div className={`bg-black text-red-500 px-4 py-2 ${className}`}>
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Head>
-        <title>News Pulse News Updates</title>
-        <meta name="description" content="Real-time news updates from News Pulse" />
-      </Head>
-
-      <header
-        className="hero"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e3388611e4c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
-        }}
+    <>
+      {tickerStyles && <style>{tickerStyles}</style>}
+      <div
+        className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="marquee"
+        aria-live="polite"
       >
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <h1>News Pulse News Updates</h1>
-          <p>Your source for real-time news from around the world</p>
-        </div>
-      </header>
-
-      <div className="container">
-        <div className="category-filter">
-          <label htmlFor="category">Filter by Category:</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setPage(1);
-            }}
+        <span className="text-red-500 animate-pulse" aria-hidden="true">
+          🔴 LIVE
+        </span>
+        <div className="relative flex-1 overflow-hidden">
+          <span
+            key={currentIndex}
+            className="ticker-enter inline-block"
+            aria-label={headlines[currentIndex]?.text || 'No headline available'}
           >
-            <option value="">All</option>
-            <option value="technology">Technology</option>
-            <option value="sports">Sports</option>
-            <option value="business">Business</option>
-            <option value="entertainment">Entertainment</option>
-          </select>
-        </div>
-
-        <BreakingTicker
-          className="news-pulse-ticker"
-          speed={5000}
-          pollingInterval={300000}
-          category={category}
-        />
-
-        <section className="featured-news">
-          <h2>Featured News</h2>
-          <div className="news-grid">
-            {featuredHeadlines.length === 0 && !isLoading ? (
-              <p>No headlines available.</p>
-            ) : (
-              featuredHeadlines.map((headline) => (
-                <div key={headline.id || Math.random()} className="news-card">
-                  <h3>{headline.text || 'No title'}</h3>
-                  <p>{headline.source || 'Unknown'}</p>
-                  <p className="date">
-                    {headline.publishedAt
-                      ? new Date(headline.publishedAt).toLocaleDateString()
-                      : 'No date'}
-                  </p>
-                </div>
-              ))
+            {headlines[currentIndex]?.text || 'No headline available'}
+            {headlines[currentIndex]?.source && (
+              <span className="text-gray-400 text-sm ml-2">
+                ({headlines[currentIndex].source})
+              </span>
             )}
-            {isLoading &&
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="news-card">
-                  <div className="skeleton skeleton-title"></div>
-                  <div className="skeleton skeleton-line"></div>
-                  <div className="skeleton skeleton-line"></div>
-                </div>
-              ))}
-          </div>
-        </section>
-
-        {hasMore && !isLoading && (
-          <div className="load-more">
-            <button onClick={handleLoadMore}>Load More</button>
-          </div>
+          </span>
+        </div>
+        {lastUpdated && (
+          <span className="text-gray-500 text-sm" aria-hidden="true">
+            Updated: {lastUpdated}
+          </span>
         )}
       </div>
-    </div>
+    </>
   );
 }
