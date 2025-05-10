@@ -24,7 +24,7 @@ export default function BreakingTicker({
   speed = 50,
   pauseOnHover = true,
   className = '',
-  pollingInterval = 300000,
+  pollingInterval = 300000, // 5 minutes
   category = '',
   language = 'english',
 }) {
@@ -51,8 +51,6 @@ export default function BreakingTicker({
       (headline) => headline && typeof headline.text === 'string' && headline.text.trim() !== ''
     );
 
-    // Future Enhancement: Add AI-driven headline prioritization
-    // Example: Sort headlines based on user preferences or trending topics using an AI model
     setHeadlines(validHeadlines);
     setIsLoading(false);
     setLastUpdated(new Date().toLocaleTimeString());
@@ -72,8 +70,8 @@ export default function BreakingTicker({
   }, [category, language]);
 
   useEffect(() => {
-    loadHeadlines();
-    pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
+    loadHeadlines(); // Initial fetch
+    pollingRef.current = setInterval(loadHeadlines, pollingInterval); // Polling
 
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
@@ -112,7 +110,7 @@ export default function BreakingTicker({
             className="text-white"
           >
             {headlines.map((headline, index) => (
-              <span key={index} className="mx-4">
+              <span key={headline.id || index} className="mx-4">
                 {headline.text} {headline.source && <span className="text-gray-300 text-sm">({headline.source})</span>}
               </span>
             ))}
