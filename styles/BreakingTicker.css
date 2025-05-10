@@ -12,3 +12,4 @@
 .ticker-exit {
   animation: slideOut 0.5s ease-out forwards;
 }
+import '../styles/BreakingTicker.css';
