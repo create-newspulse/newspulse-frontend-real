@@ -1,1 +1,4 @@
-
+.logo {
+  max-width: 150px;
+  margin-bottom: 10px;
+}
