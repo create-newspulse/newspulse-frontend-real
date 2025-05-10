@@ -7,14 +7,8 @@ export default function VoiceButton({ language }) {
   const handleVoiceCommand = () => {
     setIsListening(!isListening);
     if (!isListening) {
-      // Placeholder for starting voice recognition
       console.log(`Starting voice recognition in ${language}...`);
-      // Future integration: Use Web Speech API or third-party AI service
-      // Example: const recognition = new window.SpeechRecognition();
-      // recognition.lang = language === 'hindi' ? 'hi-IN' : language === 'gujarati' ? 'gu-IN' : 'en-US';
-      // recognition.start();
     } else {
-      // Placeholder for stopping voice recognition
       console.log('Stopping voice recognition...');
     }
   };
