@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Script from 'next/script';
 import BreakingTicker from '../components/BreakingTicker';
 import VoiceButton from '../components/VoiceButton';
 import VoiceCarousel from '../components/VoiceCarousel';
@@ -47,7 +48,7 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true);
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
   const [showPreferences, setShowPreferences] = useState(false);
-  const [interactions, setInteractions] = useState([]); // Track user interactions
+  const [interactions, setInteractions] = useState([]);
   const [preferences, updatePreferences] = usePreferences();
   const observerRef = useRef(null);
 
@@ -194,13 +195,11 @@ export default function Home() {
         throw new Error('Invalid response format: Expected an array of headlines');
       }
 
-      // Add sentiment analysis to headlines
       const enrichedHeadlines = data.map((headline) => ({
         ...headline,
         sentiment: analyzeSentiment(headline.text || ''),
       }));
 
-      // Prioritize headlines based on recommendation score
       const prioritizedHeadlines = enrichedHeadlines.sort((a, b) => {
         const aScore = calculateRecommendationScore(a, preferences, interactions);
         const bScore = calculateRecommendationScore(b, preferences, interactions);
@@ -232,7 +231,7 @@ export default function Home() {
 
   const lastHeadlineRef = useCallback(
     (node) => {
-      if (isLoading) return;
+      if (isLoading || typeof window === 'undefined') return;
       if (observerRef.current) observerRef.current.disconnect();
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
@@ -246,7 +245,7 @@ export default function Home() {
 
   const logInteraction = async (headline, action) => {
     try {
-      const userId = 'guest'; // Replace with actual user ID in a real app
+      const userId = 'guest';
       const interaction = {
         userId,
         headlineId: headline.id,
@@ -261,7 +260,6 @@ export default function Home() {
       });
       setInteractions((prev) => [...prev, interaction]);
 
-      // Track event in Google Analytics (if available)
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', action, {
           event_category: 'User Interaction',
@@ -315,6 +313,7 @@ export default function Home() {
 
   // Voice command handling
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const handleVoiceCommand = (event) => {
       const command = event.detail?.command?.toLowerCase();
       if (command === 'next headline') {
@@ -338,18 +337,24 @@ export default function Home() {
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XXXXXXXXXX');
-            `,
-          }}
-        />
       </Head>
+
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX');
+          `,
+        }}
+      />
 
       <header className="bg-royal-blue h-48 flex items-center justify-center">
         <div className="text-center">
@@ -530,25 +535,3 @@ export default function Home() {
                       <span className="text-xs text-royal-blue-light">
                         {categoryIcons[headline.category] || '📰'} {headline.category.toUpperCase()}
                       </span>
-                      <span className="text-xs text-gray-500 flex items-center">
-                        {sentimentIcons[headline.sentiment]} {t[`sentiment${headline.sentiment.charAt(0).toUpperCase() + headline.sentiment.slice(1)}`]}
-                      </span>
-                    </div>
-                    <h3 id={`headline-${headline.id}`} className="text-lg font-medium text-dark-gray">
-                      {headline.text || 'No title'}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">{headline.source || 'Unknown'}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {headline.publishedAt
-                        ? new Date(headline.publishedAt).toLocaleDateString(
-                            language === 'hindi' ? 'hi-IN' : language === 'gujarati' ? 'gu-IN' : 'en-US'
-                          )
-                        : 'No date'}
-                    </p>
-                  </div>
-                );
-              })
-            )}
-            {isLoading &&
-              Array.from({ length: 3 }).map((_, index) => (
-                <
