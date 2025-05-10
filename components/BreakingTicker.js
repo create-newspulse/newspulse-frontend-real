@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import '../styles/BreakingTicker.css';
+import '../styles/BreakingTicker.css'; // We’ll create this file
 
 const fetchHeadlines = async () => {
   try {
