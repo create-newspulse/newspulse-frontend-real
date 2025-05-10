@@ -4,7 +4,31 @@ import VoiceButton from '../components/VoiceButton';
 import VoiceCarousel from '../components/VoiceCarousel';
 import AdSpace from '../components/AdSpace';
 import usePreferences from '../hooks/usePreferences';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+
+// Lightweight sentiment analysis function
+const analyzeSentiment = (text) => {
+  const positiveWords = ['good', 'great', 'positive', 'happy', 'success'];
+  const negativeWords = ['bad', 'terrible', 'negative', 'sad', 'failure'];
+  let score = 0;
+  const words = text.toLowerCase().split(/\s+/);
+  words.forEach((word) => {
+    if (positiveWords.includes(word)) score += 1;
+    if (negativeWords.includes(word)) score -= 1;
+  });
+  if (score > 0) return 'positive';
+  if (score < 0) return 'negative';
+  return 'neutral';
+};
+
+// Simple recommendation scoring based on user interactions
+const calculateRecommendationScore = (headline, preferences, interactions) => {
+  let score = 0;
+  if (preferences.preferredCategories.includes(headline.category)) score += 2;
+  if (interactions.some((i) => i.category === headline.category && i.action === 'click')) score += 1;
+  if (interactions.some((i) => i.headlineId === headline.id && i.action === 'voice_play')) score += 1;
+  return score;
+};
 
 export default function Home() {
   const [category, setCategory] = useState('');
@@ -23,7 +47,9 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true);
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
   const [showPreferences, setShowPreferences] = useState(false);
+  const [interactions, setInteractions] = useState([]); // Track user interactions
   const [preferences, updatePreferences] = usePreferences();
+  const observerRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('language', language);
@@ -93,6 +119,9 @@ export default function Home() {
       preferences: 'Preferences',
       save: 'Save',
       preferredCategories: 'Preferred Categories:',
+      sentimentPositive: 'Positive',
+      sentimentNegative: 'Negative',
+      sentimentNeutral: 'Neutral',
     },
     hindi: {
       title: 'न्यूज़ पल्स',
@@ -116,6 +145,9 @@ export default function Home() {
       preferences: 'प्राथमिकताएँ',
       save: 'सहेजें',
       preferredCategories: 'पसंदीदा श्रेणियाँ:',
+      sentimentPositive: 'सकारात्मक',
+      sentimentNegative: 'नकारात्मक',
+      sentimentNeutral: 'तटस्थ',
     },
     gujarati: {
       title: 'ન્યૂઝ પલ્સ',
@@ -139,6 +171,9 @@ export default function Home() {
       preferences: 'પસંદગીઓ',
       save: 'સાચવો',
       preferredCategories: 'પસંદગીની શ્રેણીઓ:',
+      sentimentPositive: 'સકારાત્મક',
+      sentimentNegative: 'નકારાત્મક',
+      sentimentNeutral: 'તટસ્થ',
     },
   };
 
@@ -159,10 +194,17 @@ export default function Home() {
         throw new Error('Invalid response format: Expected an array of headlines');
       }
 
-      const prioritizedHeadlines = data.sort((a, b) => {
-        const aMatches = preferences.preferredCategories.includes(a.category) ? 1 : 0;
-        const bMatches = preferences.preferredCategories.includes(b.category) ? 1 : 0;
-        return bMatches - aMatches;
+      // Add sentiment analysis to headlines
+      const enrichedHeadlines = data.map((headline) => ({
+        ...headline,
+        sentiment: analyzeSentiment(headline.text || ''),
+      }));
+
+      // Prioritize headlines based on recommendation score
+      const prioritizedHeadlines = enrichedHeadlines.sort((a, b) => {
+        const aScore = calculateRecommendationScore(a, preferences, interactions);
+        const bScore = calculateRecommendationScore(b, preferences, interactions);
+        return bScore - aScore;
       });
 
       if (pageNum === 1) {
@@ -182,25 +224,51 @@ export default function Home() {
 
   useEffect(() => {
     fetchFeaturedHeadlines(category, language, page);
-  }, [category, language, page, preferences]);
+  }, [category, language, page, preferences, interactions]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     setPage((prev) => prev + 1);
-  };
+  }, []);
 
-  const logInteraction = async (headline) => {
+  const lastHeadlineRef = useCallback(
+    (node) => {
+      if (isLoading) return;
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          handleLoadMore();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoading, hasMore, handleLoadMore]
+  );
+
+  const logInteraction = async (headline, action) => {
     try {
       const userId = 'guest'; // Replace with actual user ID in a real app
+      const interaction = {
+        userId,
+        headlineId: headline.id,
+        category: headline.category,
+        action,
+        language,
+      };
       await fetch('/api/interactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          headlineId: headline.id,
-          category: headline.category,
-          action: 'click',
-        }),
+        body: JSON.stringify(interaction),
       });
+      setInteractions((prev) => [...prev, interaction]);
+
+      // Track event in Google Analytics (if available)
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', action, {
+          event_category: 'User Interaction',
+          event_label: headline.category,
+          value: headline.id,
+        });
+      }
     } catch (error) {
       console.error('Error logging interaction:', error.message);
     }
@@ -221,12 +289,19 @@ export default function Home() {
     technology: '💻',
   };
 
+  const sentimentIcons = {
+    positive: '😊',
+    negative: '😟',
+    neutral: '😐',
+  };
+
   const handleSavePreferences = () => {
     const selectedCategories = Array.from(document.querySelectorAll('input[name="preferredCategories"]:checked')).map(
       (input) => input.value
     );
     updatePreferences({ preferredCategories: selectedCategories });
     setShowPreferences(false);
+    logInteraction({ id: 'preferences_save', category: 'settings' }, 'save_preferences');
   };
 
   const socialMediaLinks = [
@@ -238,18 +313,42 @@ export default function Home() {
     { name: 'Instagram', icon: 'fab fa-instagram', url: 'https://instagram.com' },
   ];
 
+  // Voice command handling
+  useEffect(() => {
+    const handleVoiceCommand = (event) => {
+      const command = event.detail?.command?.toLowerCase();
+      if (command === 'next headline') {
+        setCurrentHeadlineIndex((prev) => (prev + 1) % tickerHeadlines.length);
+        logInteraction(tickerHeadlines[currentHeadlineIndex], 'voice_next');
+      }
+    };
+    window.addEventListener('voiceCommand', handleVoiceCommand);
+    return () => window.removeEventListener('voiceCommand', handleVoiceCommand);
+  }, [tickerHeadlines, currentHeadlineIndex]);
+
   return (
     <div className={`min-h-screen bg-light-gray ${fontClass}`}>
       <Head>
         <title>{t.title}</title>
-        <meta name="description" content={t.subtitle} />
+        <meta name="description" content="News Pulse: Your source for real-time, AI-powered global news in English, Hindi, and Gujarati." />
         <meta name="keywords" content="news, breaking news, global news, multilingual news, AI news" />
         <meta name="author" content="Kiran Parmar" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.newspulse.co.in" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XXXXXXXXXX');
+            `,
+          }}
+        />
       </Head>
 
       <header className="bg-royal-blue h-48 flex items-center justify-center">
@@ -258,10 +357,16 @@ export default function Home() {
           <p className="mt-2 text-lg text-gray-200">{t.subtitle}</p>
         </div>
         <div className="absolute top-4 right-4 flex space-x-2">
-          <VoiceButton language={language} headline={tickerHeadlines[currentHeadlineIndex]} />
+          <VoiceButton
+            language={language}
+            headline={tickerHeadlines[currentHeadlineIndex]}
+            fullArticle={tickerHeadlines[currentHeadlineIndex]?.fullText}
+            onVoicePlay={() => logInteraction(tickerHeadlines[currentHeadlineIndex], 'voice_play')}
+          />
           <button
             onClick={() => setShowPreferences(true)}
             className="p-2 rounded-full bg-royal-blue text-white hover:bg-royal-blue-light transition-colors flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-royal-blue-light"
+            aria-label={t.preferences}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -339,6 +444,7 @@ export default function Home() {
               onChange={(e) => {
                 setLanguage(e.target.value);
                 setPage(1);
+                logInteraction({ id: 'language_change', category: 'settings' }, `language_${e.target.value}`);
               }}
               className="p-2 border border-gray-300 rounded-md bg-white text-dark-gray focus:outline-none focus:ring-2 focus:ring-royal-blue"
             >
@@ -358,6 +464,7 @@ export default function Home() {
               onChange={(e) => {
                 setCategory(e.target.value);
                 setPage(1);
+                logInteraction({ id: 'category_filter', category: e.target.value }, 'category_filter');
               }}
               className="p-2 border border-gray-300 rounded-md bg-white text-dark-gray focus:outline-none focus:ring-2 focus:ring-royal-blue"
             >
@@ -384,86 +491,64 @@ export default function Home() {
         />
 
         <div className="mt-6">
-          <VoiceCarousel headlines={tickerHeadlines} language={language} />
+          <VoiceCarousel
+            headlines={tickerHeadlines}
+            language={language}
+            onVoicePlay={(headline) => logInteraction(headline, 'voice_play')}
+          />
         </div>
 
         <div className="mt-6 flex justify-center">
-          <AdSpace language={language} />
+          <AdSpace
+            language={language}
+            category={category}
+            userPreferences={preferences}
+            interactions={interactions}
+          />
         </div>
 
-        <section className="mt-8">
-          <h2 className="text-2xl font-semibold text-royal-blue mb-4">{t.featuredNews}</h2>
+        <section className="mt-8" aria-labelledby="featured-news">
+          <h2 id="featured-news" className="text-2xl font-semibold text-royal-blue mb-4">
+            {t.featuredNews}
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredHeadlines.length === 0 && !isLoading ? (
               <p className="col-span-full text-center text-gray-500">{t.noHeadlines}</p>
             ) : (
-              featuredHeadlines.map((headline) => (
-                <div
-                  key={headline.id || Math.random()}
-                  className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => logInteraction(headline)}
-                >
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-xs text-royal-blue-light">
-                      {categoryIcons[headline.category] || '📰'} {headline.category.toUpperCase()}
-                    </span>
+              featuredHeadlines.map((headline, index) => {
+                const isLastElement = index === featuredHeadlines.length - 1;
+                return (
+                  <div
+                    key={headline.id || Math.random()}
+                    ref={isLastElement ? lastHeadlineRef : null}
+                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => logInteraction(headline, 'click')}
+                    role="article"
+                    aria-labelledby={`headline-${headline.id}`}
+                  >
+                    <div className="flex items-center space-x-2 mb-2">
+                      <span className="text-xs text-royal-blue-light">
+                        {categoryIcons[headline.category] || '📰'} {headline.category.toUpperCase()}
+                      </span>
+                      <span className="text-xs text-gray-500 flex items-center">
+                        {sentimentIcons[headline.sentiment]} {t[`sentiment${headline.sentiment.charAt(0).toUpperCase() + headline.sentiment.slice(1)}`]}
+                      </span>
+                    </div>
+                    <h3 id={`headline-${headline.id}`} className="text-lg font-medium text-dark-gray">
+                      {headline.text || 'No title'}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">{headline.source || 'Unknown'}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {headline.publishedAt
+                        ? new Date(headline.publishedAt).toLocaleDateString(
+                            language === 'hindi' ? 'hi-IN' : language === 'gujarati' ? 'gu-IN' : 'en-US'
+                          )
+                        : 'No date'}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-medium text-dark-gray">{headline.text || 'No title'}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{headline.source || 'Unknown'}</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {headline.publishedAt
-                      ? new Date(headline.publishedAt).toLocaleDateString(
-                          language === 'hindi' ? 'hi-IN' : language === 'gujarati' ? 'gu-IN' : 'en-US'
-                        )
-                      : 'No date'}
-                  </p>
-                </div>
-              ))
+                );
+              })
             )}
             {isLoading &&
               Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-4">
-                  <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-              ))}
-          </div>
-        </section>
-
-        {hasMore && !isLoading && (
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={handleLoadMore}
-              className="px-6 py-2 bg-royal-blue text-white rounded-md hover:bg-royal-blue-light transition-colors"
-            >
-              {t.loadMore}
-            </button>
-          </div>
-        )}
-      </div>
-
-      <footer className="bg-royal-blue text-white py-6 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center space-x-6">
-            {socialMediaLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl hover:text-gray-200 transition-colors"
-                aria-label={link.name}
-              >
-                <i className={link.icon}></i>
-              </a>
-            ))}
-          </div>
-          <p className="text-center mt-4 text-sm">
-            © {new Date().getFullYear()} News Pulse. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
-  );
-}
+                <
