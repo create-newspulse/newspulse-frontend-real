@@ -31,18 +31,18 @@ export default function Home() {
   }, [language]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/headlines?action=categories');
-        if (!response.ok) throw new Error('Failed to fetch categories');
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error('Error fetching categories:', error.message);
-        setCategories(['general', 'technology', 'sports', 'business', 'entertainment', 'health', 'science']);
-      }
-    };
-    fetchCategories();
+    setCategories([
+      'news',
+      'regional',
+      'national',
+      'international',
+      'sports',
+      'business',
+      'glamorous',
+      'lifestyle',
+      'science',
+      'technology',
+    ]);
   }, []);
 
   const taglines = {
@@ -79,14 +79,17 @@ export default function Home() {
       featuredNews: 'Featured News',
       noHeadlines: 'No headlines available.',
       loadMore: 'Load More',
-      allCategories: 'All',
-      general: 'General',
-      technology: 'Technology',
+      allCategories: 'All Categories',
+      news: 'News',
+      regional: 'Regional',
+      national: 'National',
+      international: 'International',
       sports: 'Sports',
       business: 'Business',
-      entertainment: 'Entertainment',
-      health: 'Health',
+      glamorous: 'Glamorous',
+      lifestyle: 'Lifestyle',
       science: 'Science',
+      technology: 'Technology',
       preferences: 'Preferences',
       save: 'Save',
       preferredCategories: 'Preferred Categories:',
@@ -99,14 +102,17 @@ export default function Home() {
       featuredNews: 'विशेष समाचार',
       noHeadlines: 'कोई समाचार उपलब्ध नहीं।',
       loadMore: 'और लोड करें',
-      allCategories: 'सभी',
-      general: 'सामान्य',
-      technology: 'प्रौद्योगिकी',
+      allCategories: 'सभी श्रेणियाँ',
+      news: 'समाचार',
+      regional: 'क्षेत्रीय',
+      national: 'राष्ट्रीय',
+      international: 'अंतरराष्ट्रीय',
       sports: 'खेल',
       business: 'व्यापार',
-      entertainment: 'मनोरंजन',
-      health: 'स्वास्थ्य',
+      glamorous: 'ग्लैमरस',
+      lifestyle: 'लाइफस्टाइल',
       science: 'विज्ञान',
+      technology: 'प्रौद्योगिकी',
       preferences: 'प्राथमिकताएँ',
       save: 'सहेजें',
       preferredCategories: 'पसंदीदा श्रेणियाँ:',
@@ -119,14 +125,17 @@ export default function Home() {
       featuredNews: 'વિશેષ સમાચાર',
       noHeadlines: 'કોઈ સમાચાર ઉપલબ્ધ નથી.',
       loadMore: 'વધુ લોડ કરો',
-      allCategories: 'બધા',
-      general: 'સામાન્ય',
-      technology: 'ટેકનોલોજી',
+      allCategories: 'બધી શ્રેણીઓ',
+      news: 'સમાચાર',
+      regional: 'પ્રાદેશિક',
+      national: 'રાષ્ટ્રીય',
+      international: 'આંતરરાષ્ટ્રીય',
       sports: 'રમતગમત',
       business: 'વ્યવસાય',
-      entertainment: 'મનોરંજન',
-      health: 'આરોગ્ય',
+      glamorous: 'ગ્લેમરસ',
+      lifestyle: 'જીવનશૈલી',
       science: 'વિજ્ઞાન',
+      technology: 'ટેકનોલોજી',
       preferences: 'પસંદગીઓ',
       save: 'સાચવો',
       preferredCategories: 'પસંદગીની શ્રેણીઓ:',
@@ -200,13 +209,16 @@ export default function Home() {
   const fontClass = language === 'hindi' ? 'font-hindi' : language === 'gujarati' ? 'font-gujarati' : 'font-english';
 
   const categoryIcons = {
-    general: '🌐',
-    technology: '💻',
+    news: '📰',
+    regional: '🏞️',
+    national: '🇮🇳',
+    international: '🌍',
     sports: '⚽',
     business: '💼',
-    entertainment: '🎬',
-    health: '🩺',
+    glamorous: '✨',
+    lifestyle: '🌟',
     science: '🔬',
+    technology: '💻',
   };
 
   const handleSavePreferences = () => {
@@ -216,6 +228,15 @@ export default function Home() {
     updatePreferences({ preferredCategories: selectedCategories });
     setShowPreferences(false);
   };
+
+  const socialMediaLinks = [
+    { name: 'Facebook', icon: 'fab fa-facebook-f', url: 'https://facebook.com' },
+    { name: 'X', icon: 'fab fa-x-twitter', url: 'https://x.com' },
+    { name: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com' },
+    { name: 'LinkedIn', icon: 'fab fa-linkedin-in', url: 'https://linkedin.com' },
+    { name: 'Pinterest', icon: 'fab fa-pinterest-p', url: 'https://pinterest.com' },
+    { name: 'Instagram', icon: 'fab fa-instagram', url: 'https://instagram.com' },
+  ];
 
   return (
     <div className={`min-h-screen bg-light-gray ${fontClass}`}>
@@ -228,23 +249,15 @@ export default function Home() {
         <link rel="canonical" href="https://www.newspulse.co.in" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
       </Head>
 
-      <header
-        className="relative bg-cover bg-center h-64 flex items-center justify-between px-4"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e3388611e4c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
-        }}
-      >
-        <div className="absolute inset-0 bg-royal-blue opacity-70"></div>
-        <div className="relative z-10 flex items-center">
-          <div className="text-3xl font-bold text-white">{t.title}</div>
-        </div>
-        <div className="relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white">{t.title}</h1>
+      <header className="bg-royal-blue h-48 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-white">{t.title}</h1>
           <p className="mt-2 text-lg text-gray-200">{t.subtitle}</p>
         </div>
-        <div className="relative z-10 flex space-x-2">
+        <div className="absolute top-4 right-4 flex space-x-2">
           <VoiceButton language={language} headline={tickerHeadlines[currentHeadlineIndex]} />
           <button
             onClick={() => setShowPreferences(true)}
@@ -359,7 +372,7 @@ export default function Home() {
         </div>
 
         <BreakingTicker
-          className="news-pulse-ticker"
+          className="news-pulse-ticker bg-black text-white font-bold text-lg"
           speed={50}
           pollingInterval={300000}
           category={category}
@@ -429,6 +442,28 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <footer className="bg-royal-blue text-white py-6 mt-12">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center space-x-6">
+            {socialMediaLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-2xl hover:text-gray-200 transition-colors"
+                aria-label={link.name}
+              >
+                <i className={link.icon}></i>
+              </a>
+            ))}
+          </div>
+          <p className="text-center mt-4 text-sm">
+            © {new Date().getFullYear()} News Pulse. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
