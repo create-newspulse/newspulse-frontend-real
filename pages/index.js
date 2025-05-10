@@ -1,22 +1,6 @@
 import { useEffect, useState } from 'react';
 import BreakingTicker from '../components/BreakingTicker';
 import VoiceButton from '../components/VoiceButton';
-
-const taglines = [
-  "Your pulse on what matters most.",
-  "ख़बरें जो दिलों की धड़कन बनें।",
-  "સમાચાર જે દિલને સ્પર્શે."
-];
-
-const categories = [
-  { name: "Politics", icon: "🗳️" },
-  { name: "Glamour", icon: "🌟" },
-  { name: "Business", icon: "📈" },
-  { name: "Science", icon: "🔬" },
-  { name: "Sports", icon: "🏏" },
-  { name: "Youth", icon: "🎓" },
-];
-
 export default function HomePage() {
   const [taglineIndex, setTaglineIndex] = useState(0);
 
