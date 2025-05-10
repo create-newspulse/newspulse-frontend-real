@@ -21,7 +21,7 @@ const fetchHeadlines = async (category = '', language = 'english') => {
 };
 
 export default function BreakingTicker({
-  speed = 50, // Adjusted for react-fast-marquee
+  speed = 50,
   pauseOnHover = true,
   className = '',
   pollingInterval = 300000,
@@ -51,6 +51,8 @@ export default function BreakingTicker({
       (headline) => headline && typeof headline.text === 'string' && headline.text.trim() !== ''
     );
 
+    // Future Enhancement: Add AI-driven headline prioritization
+    // Example: Sort headlines based on user preferences or trending topics using an AI model
     setHeadlines(validHeadlines);
     setIsLoading(false);
     setLastUpdated(new Date().toLocaleTimeString());
@@ -82,7 +84,7 @@ export default function BreakingTicker({
 
   if (isLoading && headlines.length === 0) {
     return (
-      <div className={`bg-black text-white px-4 py-2 ${fontClass} ${className}`}>
+      <div className={`bg-royal-blue text-white px-4 py-2 ${fontClass} ${className}`}>
         {language === 'gujarati' ? 'લોડ કરી રહ્યું છે...' : language === 'hindi' ? 'लोड हो रहा है...' : 'Loading headlines...'}
       </div>
     );
@@ -90,14 +92,14 @@ export default function BreakingTicker({
 
   if (error && headlines.length === 0) {
     return (
-      <div className={`bg-black text-red-500 px-4 py-2 ${fontClass} ${className}`}>
+      <div className={`bg-royal-blue text-red-500 px-4 py-2 ${fontClass} ${className}`}>
         {error}
       </div>
     );
   }
 
   return (
-    <div className={`bg-black text-white py-2 ${fontClass} ${className}`}>
+    <div className={`bg-royal-blue text-white py-2 ${fontClass} ${className}`}>
       <div className="flex items-center space-x-3">
         <span className="text-red-500 animate-pulse px-4" aria-hidden="true">
           🔴 LIVE
@@ -111,13 +113,13 @@ export default function BreakingTicker({
           >
             {headlines.map((headline, index) => (
               <span key={index} className="mx-4">
-                {headline.text} {headline.source && <span className="text-gray-400 text-sm">({headline.source})</span>}
+                {headline.text} {headline.source && <span className="text-gray-300 text-sm">({headline.source})</span>}
               </span>
             ))}
           </Marquee>
         </div>
         {lastUpdated && (
-          <span className="text-gray-500 text-sm px-4" aria-hidden="true">
+          <span className="text-gray-300 text-sm px-4" aria-hidden="true">
             {language === 'gujarati' ? 'અપડેટ: ' : language === 'hindi' ? 'अपडेट: ' : 'Updated: '}
             {lastUpdated}
           </span>
