@@ -1,6 +1,4 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import '../styles/BreakingTicker.css'; // ✅ Import external CSS animation styles
-
 const fetchHeadlines = async (category = '') => {
   try {
     const url = category ? `/api/headlines?category=${category}` : '/api/headlines';
