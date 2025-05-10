@@ -1,7 +1,6 @@
-// components/BreakingTicker.js
+// components/BreakingTicker.js (updated version from previous message)
 import { useEffect, useState, useCallback, useRef } from 'react';
 
-// Import CSS with a fallback (in case the file is missing)
 let tickerStyles = '';
 try {
   tickerStyles = require('../styles/BreakingTicker.css');
@@ -33,7 +32,6 @@ const fetchHeadlines = async (category = '') => {
       throw new Error(`Failed to fetch headlines: ${response.statusText}`);
     }
     const data = await response.json();
-    // Validate data format
     if (!Array.isArray(data)) {
       throw new Error('Invalid response format: Expected an array of headlines');
     }
@@ -48,8 +46,8 @@ export default function BreakingTicker({
   speed = 3500,
   pauseOnHover = true,
   className = '',
-  pollingInterval = 300000, // 5 minutes
-  category = '', // Add category prop
+  pollingInterval = 300000,
+  category = '',
 }) {
   const [headlines, setHeadlines] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -62,7 +60,6 @@ export default function BreakingTicker({
   const retryCount = useRef(0);
   const maxRetries = 3;
 
-  // Fetch headlines with retry logic
   const loadHeadlines = useCallback(async () => {
     setIsLoading(true);
     const data = await fetchHeadlines(category);
@@ -70,11 +67,10 @@ export default function BreakingTicker({
     if (data.length === 0 && retryCount.current < maxRetries) {
       retryCount.current += 1;
       console.warn(`Retry attempt ${retryCount.current}/${maxRetries} for fetching headlines`);
-      setTimeout(loadHeadlines, 5000 * retryCount.current); // Exponential backoff
+      setTimeout(loadHeadlines, 5000 * retryCount.current);
       return;
     }
 
-    // Validate headline format
     const validHeadlines = data.filter(
       (headline) => headline && typeof headline.text === 'string' && headline.text.trim() !== ''
     );
@@ -89,9 +85,8 @@ export default function BreakingTicker({
     } else {
       setError(null);
     }
-  }, [category]); // Add category to dependencies
+  }, [category]);
 
-  // Initial fetch and periodic polling
   useEffect(() => {
     loadHeadlines();
     pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
@@ -101,7 +96,6 @@ export default function BreakingTicker({
     };
   }, [loadHeadlines, pollingInterval]);
 
-  // Handle ticker animation
   const startTicker = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = window.setInterval(() => {
@@ -118,7 +112,6 @@ export default function BreakingTicker({
     };
   }, [headlines.length, isPaused, startTicker]);
 
-  // Handle pause on hover
   const handleMouseEnter = () => {
     if (pauseOnHover) setIsPaused(true);
   };
@@ -127,7 +120,6 @@ export default function BreakingTicker({
     if (pauseOnHover) setIsPaused(false);
   };
 
-  // Accessibility: Handle keyboard navigation
   const handleKeyDown = (e) => {
     if (e.key === ' ') {
       e.preventDefault();
