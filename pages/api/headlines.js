@@ -1,4 +1,4 @@
-// pages/api/headlines.js
+// pages/api/headlines.js (unchanged)
 import axios from 'axios';
 
 const API_CONFIGS = {
