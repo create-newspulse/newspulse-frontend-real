@@ -1,150 +1,254 @@
-// pages/index.js
-import Head from 'next/head';
-import BreakingTicker from '../components/BreakingTicker';
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
-export default function Home() {
-  const [category, setCategory] = useState(''); // Category filter
-  const [featuredHeadlines, setFeaturedHeadlines] = useState([]); // Featured news
-  const [page, setPage] = useState(1); // Pagination
-  const [isLoading, setIsLoading] = useState(false); // Loading state
-  const [hasMore, setHasMore] = useState(true); // More headlines to load
+// API configurations
+const API_CONFIGS = {
+  newsapi: {
+    url: 'https://newsapi.org/v2/top-headlines?language=en&pageSize=10',
+    key: 'd6cda5432c664498a61b9716f315f772',
+    mapResponse: (data) =>
+      data.articles.map((article, index) => ({
+        id: `${index}-${article.publishedAt || Date.now()}`,
+        text: article.title,
+        source: article.source.name,
+        publishedAt: article.publishedAt,
+      })),
+  },
+  newsdata: {
+    url: 'https://newsdata.io/api/1/news?language=en&size=10',
+    key: 'pub_854060b07532e1e92a586939878c2ffa18131',
+    mapResponse: (data) =>
+      data.results.map((article, index) => ({
+        id: `${index}-${article.pubDate || Date.now()}`,
+        text: article.title,
+        source: article.source_name || 'Unknown',
+        publishedAt: article.pubDate,
+      })),
+  },
+  thenewsapi: {
+    url: 'https://api.thenewsapi.com/v1/news/top?locale=us&language=en&limit=10',
+    key: 'NEkDgFxwbVPTE04MZgrrvN5IesXloHsK2ifFuXbw',
+    mapResponse: (data) =>
+      data.data.map((article, index) => ({
+        id: `${index}-${article.published_at || Date.now()}`,
+        text: article.title,
+        source: article.source || 'Unknown',
+        publishedAt: article.published_at,
+      })),
+  },
+  mediastack: {
+    url: 'http://api.mediastack.com/v1/news?languages=en&limit=10',
+    key: '2a38a5e69e2648013aba40a407bd1b38',
+    mapResponse: (data) =>
+      data.data.map((article, index) => ({
+        id: `${index}-${article.published_at || Date.now()}`,
+        text: article.title,
+        source: article.source || 'Unknown',
+        publishedAt: article.published_at,
+      })),
+  },
+  gnews: {
+    url: 'https://gnews.io/api/v4/top-headlines?lang=en&max=10',
+    key: 'f703727c81cc39fd08ef8074b59c8ba0',
+    mapResponse: (data) =>
+      data.articles.map((article, index) => ({
+        id: `${index}-${article.publishedAt || Date.now()}`,
+        text: article.title,
+        source: article.source.name || 'Unknown',
+        publishedAt: article.publishedAt,
+      })),
+  },
+};
 
-  // Fetch featured headlines
-  const fetchFeaturedHeadlines = async (selectedCategory, pageNum) => {
-    setIsLoading(true);
-    try {
-      const url = selectedCategory
-        ? `/api/headlines?category=${selectedCategory}&page=${pageNum}`
-        : `/api/headlines?page=${pageNum}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch featured headlines');
-      const data = await response.json();
-
-      // Update headlines
-      if (pageNum === 1) {
-        setFeaturedHeadlines(data);
-      } else {
-        setFeaturedHeadlines((prev) => [...prev, ...data]);
+// Fetch headlines from multiple APIs
+const fetchHeadlines = async () => {
+  try {
+    const fetchPromises = Object.entries(API_CONFIGS).map(async ([name, config]) => {
+      try {
+        const response = await fetch(`${config.url}&apikey=${config.key}`, {
+          headers: { Accept: 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Failed to fetch from ${name}`);
+        const data = await response.json();
+        return config.mapResponse(data);
+      } catch (error) {
+        console.error(`Error fetching from ${name}:`, error);
+        return [];
       }
+    });
 
-      // Check if there are more headlines to load
-      setHasMore(data.length === 10); // Assuming API returns 10 items per page
-    } catch (error) {
-      console.error('Error fetching featured headlines:', error);
-    } finally {
-      setIsLoading(false);
+    const results = await Promise.all(fetchPromises);
+    // Flatten, deduplicate by text, and sort by publishedAt (newest first)
+    const allHeadlines = results
+      .flat()
+      .filter((headline, index, self) => 
+        headline.text && 
+        index === self.findIndex(h => h.text.toLowerCase() === headline.text.toLowerCase())
+      )
+      .sort((a, b) => 
+        (b.publishedAt ? new Date(b.publishedAt).getTime() : 0) - 
+        (a.publishedAt ? new Date(a.publishedAt).getTime() : 0)
+      );
+
+    return allHeadlines.slice(0, 20); // Limit to 20 headlines
+  } catch (error) {
+    console.error('Failed to fetch headlines:', error);
+    return [];
+  }
+};
+
+// CSS styles
+const tickerStyles = `
+  @keyframes slideIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes slideOut {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-100%); opacity: 0; }
+  }
+  .ticker-enter {
+    animation: slideIn 0.5s ease-out forwards;
+  }
+  .ticker-exit {
+    animation: slideOut 0.5s ease-out forwards;
+  }
+`;
+
+export default function BreakingTicker({
+  speed = 3500,
+  pauseOnHover = true,
+  className = '',
+  pollingInterval = 300000 // 5 minutes
+}) {
+  const [headlines, setHeadlines] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const intervalRef = useRef(null);
+  const pollingRef = useRef(null);
+  const retryCount = useRef(0);
+  const maxRetries = 3;
+
+  // Fetch headlines with retry logic
+  const loadHeadlines = useCallback(async () => {
+    setIsLoading(true);
+    const data = await fetchHeadlines();
+    
+    if (data.length === 0 && retryCount.current < maxRetries) {
+      retryCount.current += 1;
+      setTimeout(loadHeadlines, 5000 * retryCount.current); // Exponential backoff
+      return;
+    }
+
+    setHeadlines(data);
+    setIsLoading(false);
+    setLastUpdated(new Date().toLocaleTimeString());
+    retryCount.current = 0;
+    
+    if (data.length === 0) {
+      setError('No headlines available');
+    } else {
+      setError(null);
+    }
+  }, []);
+
+  // Initial fetch and periodic polling
+  useEffect(() => {
+    loadHeadlines();
+    pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
+    
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [loadHeadlines, pollingInterval]);
+
+  // Handle ticker animation
+  const startTicker = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = window.setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % (headlines.length || 1));
+    }, speed);
+  }, [speed, headlines.length]);
+
+  useEffect(() => {
+    if (headlines.length > 0 && !isPaused) {
+      startTicker();
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [headlines.length, isPaused, startTicker]);
+
+  // Handle pause on hover
+  const handleMouseEnter = () => {
+    if (pauseOnHover) setIsPaused(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (pauseOnHover) setIsPaused(false);
+  };
+
+  // Accessibility: Handle keyboard navigation
+  const handleKeyDown = (e) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+      setIsPaused(!isPaused);
     }
   };
 
-  // Fetch headlines when category or page changes
-  useEffect(() => {
-    fetchFeaturedHeadlines(category, page);
-  }, [category, page]);
+  if (isLoading && headlines.length === 0) {
+    return (
+      <div className={`bg-black text-white px-4 py-2 ${className}`}>
+        Loading headlines...
+      </div>
+    );
+  }
 
-  // Load more headlines
-  const handleLoadMore = () => {
-    setPage((prev) => prev + 1);
-  };
+  if (error && headlines.length === 0) {
+    return (
+      <div className={`bg-black text-red-500 px-4 py-2 ${className}`}>
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Head>
-        <title>News Pulse News Updates</title>
-        <meta name="description" content="Real-time news updates from News Pulse" />
-      </Head>
-
-      {/* Hero Section */}
-      <header
-        className="relative bg-cover bg-center h-64 flex items-center justify-center"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e3388611e4c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
-        }}
+    <>
+      <style>{tickerStyles}</style>
+      <div
+        className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="marquee"
+        aria-live="polite"
       >
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white">News Pulse News Updates</h1>
-          <p className="mt-2 text-lg text-gray-200">Your source for real-time news from around the world</p>
-        </div>
-      </header>
-
-      {/* Category Filter */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center space-x-4">
-            <label htmlFor="category" className="text-lg font-medium text-gray-700">
-              Filter by Category:
-            </label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                setPage(1); // Reset page when category changes
-              }}
-              className="p-2 border rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All</option>
-              <option value="technology">Technology</option>
-              <option value="sports">Sports</option>
-              <option value="business">Business</option>
-              <option value="entertainment">Entertainment</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Breaking Ticker */}
-        <BreakingTicker
-          className="news-pulse-ticker"
-          speed={5000}
-          pollingInterval={300000}
-          category={category}
-        />
-
-        {/* Featured News Section */}
-        <section className="mt-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Featured News</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredHeadlines.length === 0 && !isLoading ? (
-              <p className="col-span-full text-center text-gray-500">No headlines available.</p>
-            ) : (
-              featuredHeadlines.map((headline) => (
-                <div
-                  key={headline.id}
-                  className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
-                >
-                  <h3 className="text-lg font-medium text-gray-800">{headline.text}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{headline.source}</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {new Date(headline.publishedAt).toLocaleDateString()}
-                  </p>
-                </div>
-              ))
+        <span className="text-red-500 animate-pulse" aria-hidden="true">
+          🔴 LIVE
+        </span>
+        <div className="relative flex-1 overflow-hidden">
+          <span
+            key={currentIndex}
+            className="ticker-enter inline-block"
+            aria-label={headlines[currentIndex]?.text}
+          >
+            {headlines[currentIndex]?.text}
+            {headlines[currentIndex]?.source && (
+              <span className="text-gray-400 text-sm ml-2">
+                ({headlines[currentIndex].source})
+              </span>
             )}
-            {/* Skeleton Loading */}
-            {isLoading &&
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-4">
-                  <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-              ))}
-          </div>
-        </section>
-
-        {/* Load More Button */}
-        {hasMore && !isLoading && (
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={handleLoadMore}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Load More
-            </button>
-          </div>
+          </span>
+        </div>
+        {lastUpdated && (
+          <span className="text-gray-500 text-sm" aria-hidden="true">
+            Updated: {lastUpdated}
+          </span>
         )}
       </div>
-    </div>
+    </>
   );
 }
