@@ -18,6 +18,7 @@ module.exports = {
         },
         'dark-gray': '#333333',
         'light-gray': '#F5F5F5',
+        'crimson': '#DC143C', // Deeper red to complement Royal Blue
       },
     },
   },
