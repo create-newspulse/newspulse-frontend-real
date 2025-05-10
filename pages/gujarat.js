@@ -1,36 +1,43 @@
 import { useEffect, useState } from 'react';
+import fetchGujaratiRSS from '../lib/fetchGujaratiRSS';
 import { useLanguage } from '../utils/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
-import fetchTopNewswithAutoKey from '../lib/fetchTopNewsAuto';
 
 export default function GujaratNews() {
   const { language, setLanguage } = useLanguage();
-  const [topHeadlines, setTopHeadlines] = useState([]);
+  const [articles, setArticles] = useState([]);
 
   useEffect(() => {
-    setLanguage('gujarati');
-    fetchTopNewswithAutoKey('gujarati').then(setTopHeadlines);
+    setLanguage('gujarati'); // Set context
+    fetchGujaratiRSS().then(setArticles);
   }, []);
 
   return (
     <>
       <LanguageToggle />
-      <main className="p-4 font-gujarati">
-        <h1 className="text-4xl font-bold text-center text-green-700">
-          🟢 News Pulse – Gujarati
+      <main className="p-4 font-gujarati space-y-6">
+        <h1 className="text-4xl font-bold text-green-700 text-center">
+          🟢 News Pulse – Gujarati Headlines
         </h1>
-        {topHeadlines.length > 0 ? (
-          <ul className="mt-6 space-y-2">
-            {topHeadlines.map((article, i) => (
-              <li key={i}>
-                <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                  {article.title}
+
+        {articles.length > 0 ? (
+          <ul className="space-y-4">
+            {articles.map((item, i) => (
+              <li key={i} className="border-b pb-2">
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-semibold text-blue-700 hover:underline"
+                >
+                  {item.title}
                 </a>
+                <p className="text-sm text-gray-600">{item.description}</p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-yellow-600 text-center mt-10">⚠️ કોઈ સમાચાર ઉપલબ્ધ નથી.</p>
+          <p className="text-center text-gray-500">Loading Gujarati news...</p>
         )}
       </main>
     </>
