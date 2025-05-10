@@ -1,18 +1,46 @@
+// components/VoiceButton.js
 import { useState } from 'react';
 
-export default function VoiceButton() {
-  const [isPlaying, setIsPlaying] = useState(false);
+export default function VoiceButton({ language }) {
+  const [isListening, setIsListening] = useState(false);
 
-  const toggleVoice = () => {
-    setIsPlaying(!isPlaying);
+  const handleVoiceCommand = () => {
+    setIsListening(!isListening);
+    if (!isListening) {
+      // Placeholder for starting voice recognition
+      console.log(`Starting voice recognition in ${language}...`);
+      // Future integration: Use Web Speech API or third-party AI service
+      // Example: const recognition = new window.SpeechRecognition();
+      // recognition.lang = language === 'hindi' ? 'hi-IN' : language === 'gujarati' ? 'gu-IN' : 'en-US';
+      // recognition.start();
+    } else {
+      // Placeholder for stopping voice recognition
+      console.log('Stopping voice recognition...');
+    }
   };
+
+  const buttonText = language === 'hindi' ? 'आवाज़ शुरू करें' : language === 'gujarati' ? 'આવાજ શરૂ કરો' : 'Start Voice';
 
   return (
     <button
-      onClick={toggleVoice}
-      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center space-x-2"
+      onClick={handleVoiceCommand}
+      className={`p-2 rounded-full bg-royal-blue text-white hover:bg-royal-blue-light transition-colors flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-royal-blue-light ${isListening ? 'animate-pulse' : ''}`}
     >
-      <span>{isPlaying ? "⏹ Stop Voice" : "🔊 Play Voice"}</span>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-7a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+        />
+      </svg>
+      <span>{isListening ? (language === 'hindi' ? 'सुन रहा है...' : language === 'gujarati' ? 'સાંભળી રહ્યું છે...' : 'Listening...') : buttonText}</span>
     </button>
   );
 }
