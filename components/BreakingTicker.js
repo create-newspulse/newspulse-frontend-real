@@ -1,27 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 
-// Types
-interface Headline {
-  id: string;
-  text: string;
-  source?: string;
-  publishedAt?: string;
-}
-
-interface TickerProps {
-  speed?: number; // Transition speed in ms
-  pauseOnHover?: boolean;
-  className?: string;
-  pollingInterval?: number; // Polling interval in ms
-}
-
 // API configurations
 const API_CONFIGS = {
   newsapi: {
     url: 'https://newsapi.org/v2/top-headlines?language=en&pageSize=10',
     key: 'd6cda5432c664498a61b9716f315f772',
-    mapResponse: (data: any) =>
-      data.articles.map((article: any, index: number) => ({
+    mapResponse: (data) =>
+      data.articles.map((article, index) => ({
         id: `${index}-${article.publishedAt || Date.now()}`,
         text: article.title,
         source: article.source.name,
@@ -31,8 +16,8 @@ const API_CONFIGS = {
   newsdata: {
     url: 'https://newsdata.io/api/1/news?language=en&size=10',
     key: 'pub_854060b07532e1e92a586939878c2ffa18131',
-    mapResponse: (data: any) =>
-      data.results.map((article: any, index: number) => ({
+    mapResponse: (data) =>
+      data.results.map((article, index) => ({
         id: `${index}-${article.pubDate || Date.now()}`,
         text: article.title,
         source: article.source_name || 'Unknown',
@@ -42,8 +27,8 @@ const API_CONFIGS = {
   thenewsapi: {
     url: 'https://api.thenewsapi.com/v1/news/top?locale=us&language=en&limit=10',
     key: 'NEkDgFxwbVPTE04MZgrrvN5IesXloHsK2ifFuXbw',
-    mapResponse: (data: any) =>
-      data.data.map((article: any, index: number) => ({
+    mapResponse: (data) =>
+      data.data.map((article, index) => ({
         id: `${index}-${article.published_at || Date.now()}`,
         text: article.title,
         source: article.source || 'Unknown',
@@ -53,8 +38,8 @@ const API_CONFIGS = {
   mediastack: {
     url: 'http://api.mediastack.com/v1/news?languages=en&limit=10',
     key: '2a38a5e69e2648013aba40a407bd1b38',
-    mapResponse: (data: any) =>
-      data.data.map((article: any, index: number) => ({
+    mapResponse: (data) =>
+      data.data.map((article, index) => ({
         id: `${index}-${article.published_at || Date.now()}`,
         text: article.title,
         source: article.source || 'Unknown',
@@ -64,8 +49,8 @@ const API_CONFIGS = {
   gnews: {
     url: 'https://gnews.io/api/v4/top-headlines?lang=en&max=10',
     key: 'f703727c81cc39fd08ef8074b59c8ba0',
-    mapResponse: (data: any) =>
-      data.articles.map((article: any, index: number) => ({
+    mapResponse: (data) =>
+      data.articles.map((article, index) => ({
         id: `${index}-${article.publishedAt || Date.now()}`,
         text: article.title,
         source: article.source.name || 'Unknown',
@@ -75,7 +60,7 @@ const API_CONFIGS = {
 };
 
 // Fetch headlines from multiple APIs
-const fetchHeadlines = async (): Promise<Headline[]> => {
+const fetchHeadlines = async () => {
   try {
     const fetchPromises = Object.entries(API_CONFIGS).map(async ([name, config]) => {
       try {
@@ -134,16 +119,16 @@ export default function BreakingTicker({
   pauseOnHover = true,
   className = '',
   pollingInterval = 300000 // 5 minutes
-}: TickerProps) {
-  const [headlines, setHeadlines] = useState<Headline[]>([]);
+}) {
+  const [headlines, setHeadlines] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const intervalRef = useRef<number | null>(null);
-  const pollingRef = useRef<number | null>(null);
-  const retryCount = useRef<number>(0);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const intervalRef = useRef(null);
+  const pollingRef = useRef(null);
+  const retryCount = useRef(0);
   const maxRetries = 3;
 
   // Fetch headlines with retry logic
@@ -206,7 +191,7 @@ export default function BreakingTicker({
   };
 
   // Accessibility: Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e) => {
     if (e.key === ' ') {
       e.preventDefault();
       setIsPaused(!isPaused);
