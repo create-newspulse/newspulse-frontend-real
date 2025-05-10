@@ -1,3 +1,4 @@
+// pages/_app.js
 import '../styles/globals.css';
 import { LanguageProvider } from '../utils/LanguageContext';
 
