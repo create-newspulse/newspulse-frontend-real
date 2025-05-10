@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.newspulse.co.in/sitemap.xml
