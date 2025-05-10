@@ -107,7 +107,7 @@ export default function Home() {
   const fontClass = language === 'hindi' ? 'font-hindi' : language === 'gujarati' ? 'font-gujarati' : 'font-english';
 
   return (
-    <div className={`min-h-screen bg-gray-100 ${fontClass}`}>
+    <div className={`min-h-screen bg-light-gray ${fontClass}`}>
       <Head>
         <title>{t.title}</title>
         <meta name="description" content={t.subtitle} />
@@ -119,7 +119,7 @@ export default function Home() {
           backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e3388611e4c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
         }}
       >
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-royal-blue opacity-70"></div> {/* Updated overlay to Royal Blue */
         <div className="relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white">{t.title}</h1>
           <p className="mt-2 text-lg text-gray-200">{t.subtitle}</p>
@@ -129,7 +129,7 @@ export default function Home() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
           <div className="flex items-center space-x-4">
-            <label htmlFor="language" className="text-lg font-medium text-gray-700">
+            <label htmlFor="language" className="text-lg font-medium text-dark-gray">
               {t.languageLabel}
             </label>
             <select
@@ -139,7 +139,7 @@ export default function Home() {
                 setLanguage(e.target.value);
                 setPage(1);
               }}
-              className="p-2 border rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-2 border border-gray-300 rounded-md bg-white text-dark-gray focus:outline-none focus:ring-2 focus:ring-royal-blue"
             >
               <option value="english">English</option>
               <option value="hindi">हिन्दी</option>
@@ -148,7 +148,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <label htmlFor="category" className="text-lg font-medium text-gray-700">
+            <label htmlFor="category" className="text-lg font-medium text-dark-gray">
               {t.categoryLabel}
             </label>
             <select
@@ -158,7 +158,7 @@ export default function Home() {
                 setCategory(e.target.value);
                 setPage(1);
               }}
-              className="p-2 border rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-2 border border-gray-300 rounded-md bg-white text-dark-gray focus:outline-none focus:ring-2 focus:ring-royal-blue"
             >
               <option value="">{t.allCategories}</option>
               <option value="technology">{t.technology}</option>
@@ -178,7 +178,7 @@ export default function Home() {
         />
 
         <section className="mt-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t.featuredNews}</h2>
+          <h2 className="text-2xl font-semibold text-royal-blue mb-4">{t.featuredNews}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredHeadlines.length === 0 && !isLoading ? (
               <p className="col-span-full text-center text-gray-500">{t.noHeadlines}</p>
@@ -188,7 +188,7 @@ export default function Home() {
                   key={headline.id || Math.random()}
                   className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
                 >
-                  <h3 className="text-lg font-medium text-gray-800">{headline.text || 'No title'}</h3>
+                  <h3 className="text-lg font-medium text-dark-gray">{headline.text || 'No title'}</h3>
                   <p className="text-sm text-gray-500 mt-1">{headline.source || 'Unknown'}</p>
                   <p className="text-xs text-gray-400 mt-1">
                     {headline.publishedAt
@@ -215,7 +215,7 @@ export default function Home() {
           <div className="flex justify-center mt-8">
             <button
               onClick={handleLoadMore}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-royal-blue text-white rounded-md hover:bg-royal-blue-light transition-colors"
             >
               {t.loadMore}
             </button>
