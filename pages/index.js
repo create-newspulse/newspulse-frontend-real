@@ -2,7 +2,6 @@
 import Head from 'next/head';
 import BreakingTicker from '../components/BreakingTicker';
 import VoiceButton from '../components/VoiceButton';
-import AIAnchor from '../components/AIAnchor';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -17,7 +16,6 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [userPreferences, setUserPreferences] = useState(null); // Placeholder for AI personalization
 
   useEffect(() => {
     localStorage.setItem('language', language);
@@ -25,7 +23,7 @@ export default function Home() {
 
   const translations = {
     english: {
-      title: 'News Pulse News Updates',
+      title: 'News Pulse',
       subtitle: 'Your source for real-time news from around the world',
       languageLabel: 'Language:',
       categoryLabel: 'Filter by Category:',
@@ -39,7 +37,7 @@ export default function Home() {
       entertainment: 'Entertainment',
     },
     hindi: {
-      title: 'न्यूज़ पल्स समाचार अपडेट',
+      title: 'न्यूज़ पल्स',
       subtitle: 'दुनिया भर से रीयल-टाइम समाचार के लिए आपका स्रोत',
       languageLabel: 'भाषा:',
       categoryLabel: 'श्रेणी द्वारा फ़िल्टर करें:',
@@ -53,7 +51,7 @@ export default function Home() {
       entertainment: 'मनोरंजन',
     },
     gujarati: {
-      title: 'ન્યૂઝ પલ્સ સમાચાર અપડેટ્સ',
+      title: 'ન્યૂઝ પલ્સ',
       subtitle: 'વિશ્વભરના રીયલ-ટાઇમ સમાચાર માટે તમારો સ્ત્રોત',
       languageLabel: 'ભાષા:',
       categoryLabel: 'શ્રેણી દ્વારા ફિલ્ટર કરો:',
@@ -84,8 +82,6 @@ export default function Home() {
       if (!Array.isArray(data)) {
         throw new Error('Invalid response format: Expected an array of headlines');
       }
-      // Future Enhancement: Apply AI personalization
-      // Example: Filter headlines based on userPreferences (e.g., preferred categories, languages)
       if (pageNum === 1) {
         setFeaturedHeadlines(data);
       } else {
@@ -126,10 +122,7 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-royal-blue opacity-70"></div>
         <div className="relative z-10 flex items-center">
-          {/* Branding Logo */}
-          <div className="text-3xl font-bold text-white">
-            News Pulse
-          </div>
+          <div className="text-3xl font-bold text-white">{t.title}</div>
         </div>
         <div className="relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white">{t.title}</h1>
@@ -158,7 +151,6 @@ export default function Home() {
               <option value="english">English</option>
               <option value="hindi">हिन्दी</option>
               <option value="gujarati">ગુજરાતી</option>
-              {/* Future Enhancement: Add more languages here */}
             </select>
           </div>
 
@@ -192,13 +184,9 @@ export default function Home() {
           language={language}
         />
 
-        {/* Ad Banner Placeholder */}
         <div className="mt-6 bg-gray-200 h-24 flex items-center justify-center rounded-lg">
           <p className="text-gray-500">Ad Space - 728x90 Banner</p>
         </div>
-
-        {/* AI Anchor (Uncomment to enable) */}
-        {/* <AIAnchor language={language} headlines={featuredHeadlines} /> */}
 
         <section className="mt-8">
           <h2 className="text-2xl font-semibold text-royal-blue mb-4">{t.featuredNews}</h2>
