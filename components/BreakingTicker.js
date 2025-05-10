@@ -1,28 +1,5 @@
-// components/BreakingTicker.js (updated version from previous message)
 import { useEffect, useState, useCallback, useRef } from 'react';
-
-let tickerStyles = '';
-try {
-  tickerStyles = require('../styles/BreakingTicker.css');
-} catch (error) {
-  console.warn('BreakingTicker.css not found. Using fallback styles.');
-  tickerStyles = `
-    @keyframes slideIn {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-      from { transform: translateY(0); opacity: 1; }
-      to { transform: translateY(-100%); opacity: 0; }
-    }
-    .ticker-enter {
-      animation: slideIn 0.5s ease-out forwards;
-    }
-    .ticker-exit {
-      animation: slideOut 0.5s ease-out forwards;
-    }
-  `;
-}
+import '../styles/BreakingTicker.css'; // ✅ Import external CSS animation styles
 
 const fetchHeadlines = async (category = '') => {
   try {
@@ -89,37 +66,24 @@ export default function BreakingTicker({
 
   useEffect(() => {
     loadHeadlines();
-    pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
-
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
+    pollingRef.current = setInterval(loadHeadlines, pollingInterval);
+    return () => clearInterval(pollingRef.current);
   }, [loadHeadlines, pollingInterval]);
 
   const startTicker = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = window.setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % (headlines.length || 1));
     }, speed);
   }, [speed, headlines.length]);
 
   useEffect(() => {
-    if (headlines.length > 0 && !isPaused) {
-      startTicker();
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    if (headlines.length > 0 && !isPaused) startTicker();
+    return () => clearInterval(intervalRef.current);
   }, [headlines.length, isPaused, startTicker]);
 
-  const handleMouseEnter = () => {
-    if (pauseOnHover) setIsPaused(true);
-  };
-
-  const handleMouseLeave = () => {
-    if (pauseOnHover) setIsPaused(false);
-  };
-
+  const handleMouseEnter = () => pauseOnHover && setIsPaused(true);
+  const handleMouseLeave = () => pauseOnHover && setIsPaused(false);
   const handleKeyDown = (e) => {
     if (e.key === ' ') {
       e.preventDefault();
@@ -128,56 +92,45 @@ export default function BreakingTicker({
   };
 
   if (isLoading && headlines.length === 0) {
-    return (
-      <div className={`bg-black text-white px-4 py-2 ${className}`}>
-        Loading headlines...
-      </div>
-    );
+    return <div className={`bg-black text-white px-4 py-2 ${className}`}>Loading headlines...</div>;
   }
 
   if (error && headlines.length === 0) {
-    return (
-      <div className={`bg-black text-red-500 px-4 py-2 ${className}`}>
-        {error}
-      </div>
-    );
+    return <div className={`bg-black text-red-500 px-4 py-2 ${className}`}>{error}</div>;
   }
 
   return (
-    <>
-      {tickerStyles && <style>{tickerStyles}</style>}
-      <div
-        className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
-        role="marquee"
-        aria-live="polite"
-      >
-        <span className="text-red-500 animate-pulse" aria-hidden="true">
-          🔴 LIVE
+    <div
+      className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="marquee"
+      aria-live="polite"
+    >
+      <span className="text-red-500 animate-pulse" aria-hidden="true">
+        🔴 LIVE
+      </span>
+      <div className="relative flex-1 overflow-hidden">
+        <span
+          key={currentIndex}
+          className="ticker-enter inline-block"
+          aria-label={headlines[currentIndex]?.text || 'No headline available'}
+        >
+          {headlines[currentIndex]?.text || 'No headline available'}
+          {headlines[currentIndex]?.source && (
+            <span className="text-gray-400 text-sm ml-2">
+              ({headlines[currentIndex].source})
+            </span>
+          )}
         </span>
-        <div className="relative flex-1 overflow-hidden">
-          <span
-            key={currentIndex}
-            className="ticker-enter inline-block"
-            aria-label={headlines[currentIndex]?.text || 'No headline available'}
-          >
-            {headlines[currentIndex]?.text || 'No headline available'}
-            {headlines[currentIndex]?.source && (
-              <span className="text-gray-400 text-sm ml-2">
-                ({headlines[currentIndex].source})
-              </span>
-            )}
-          </span>
-        </div>
-        {lastUpdated && (
-          <span className="text-gray-500 text-sm" aria-hidden="true">
-            Updated: {lastUpdated}
-          </span>
-        )}
       </div>
-    </>
+      {lastUpdated && (
+        <span className="text-gray-500 text-sm" aria-hidden="true">
+          Updated: {lastUpdated}
+        </span>
+      )}
+    </div>
   );
 }
