@@ -1,4 +1,7 @@
-import Head from 'next/head';
+<header>
+  <img src="/logo.png" alt="News Pulse Logo" className="logo" />
+  <h1>News Pulse News Updates</h1>
+</header>import Head from 'next/head';
 import { useState, useEffect } from 'react';
 
 // ✅ Voice Button Component
