@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --royal-blue: #4169E1;
+  --royal-blue-light: #5a8bff;
+  --light-gray: #f5f5f5;
+  --dark-gray: #333;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.font-english {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-hindi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+.font-gujarati {
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.news-pulse-ticker {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Rainbow Waves Animation */
+@keyframes rainbow-wave {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.3);
+  }
+}
+
+.animate-rainbow-wave {
+  animation: rainbow-wave 1.5s infinite;
+}
