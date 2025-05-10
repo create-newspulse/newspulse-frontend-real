@@ -1,9 +1,11 @@
+// components/BreakingTicker.js
 import { useEffect, useState, useCallback, useRef } from 'react';
-import '../styles/BreakingTicker.css'; // We’ll create this file
+import '../styles/BreakingTicker.css';
 
-const fetchHeadlines = async () => {
+const fetchHeadlines = async (category) => {
   try {
-    const response = await fetch('/api/headlines');
+    const url = category ? `/api/headlines?category=${category}` : '/api/headlines';
+    const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to fetch headlines');
     const data = await response.json();
     return data;
@@ -17,7 +19,8 @@ export default function BreakingTicker({
   speed = 3500,
   pauseOnHover = true,
   className = '',
-  pollingInterval = 300000 // 5 minutes
+  pollingInterval = 300000,
+  category = '',
 }) {
   const [headlines, setHeadlines] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -30,14 +33,13 @@ export default function BreakingTicker({
   const retryCount = useRef(0);
   const maxRetries = 3;
 
-  // Fetch headlines with retry logic
   const loadHeadlines = useCallback(async () => {
     setIsLoading(true);
-    const data = await fetchHeadlines();
-    
+    const data = await fetchHeadlines(category);
+
     if (data.length === 0 && retryCount.current < maxRetries) {
       retryCount.current += 1;
-      setTimeout(loadHeadlines, 5000 * retryCount.current); // Exponential backoff
+      setTimeout(loadHeadlines, 5000 * retryCount.current);
       return;
     }
 
@@ -45,25 +47,23 @@ export default function BreakingTicker({
     setIsLoading(false);
     setLastUpdated(new Date().toLocaleTimeString());
     retryCount.current = 0;
-    
+
     if (data.length === 0) {
       setError('No headlines available');
     } else {
       setError(null);
     }
-  }, []);
+  }, [category]);
 
-  // Initial fetch and periodic polling
   useEffect(() => {
     loadHeadlines();
     pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
-    
+
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, [loadHeadlines, pollingInterval]);
 
-  // Handle ticker animation
   const startTicker = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = window.setInterval(() => {
@@ -80,7 +80,6 @@ export default function BreakingTicker({
     };
   }, [headlines.length, isPaused, startTicker]);
 
-  // Handle pause on hover
   const handleMouseEnter = () => {
     if (pauseOnHover) setIsPaused(true);
   };
@@ -89,7 +88,6 @@ export default function BreakingTicker({
     if (pauseOnHover) setIsPaused(false);
   };
 
-  // Accessibility: Handle keyboard navigation
   const handleKeyDown = (e) => {
     if (e.key === ' ') {
       e.preventDefault();
