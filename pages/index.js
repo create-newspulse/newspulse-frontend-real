@@ -1,183 +1,227 @@
-// components/BreakingTicker.js (updated version from previous message)
-import { useEffect, useState, useCallback, useRef } from 'react';
+// pages/index.js
+import Head from 'next/head';
+import BreakingTicker from '../components/BreakingTicker';
+import { useState, useEffect } from 'react';
 
-let tickerStyles = '';
-try {
-  tickerStyles = require('../styles/BreakingTicker.css');
-} catch (error) {
-  console.warn('BreakingTicker.css not found. Using fallback styles.');
-  tickerStyles = `
-    @keyframes slideIn {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+export default function Home() {
+  const [category, setCategory] = useState('');
+  const [language, setLanguage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('language') || 'english';
     }
-    @keyframes slideOut {
-      from { transform: translateY(0); opacity: 1; }
-      to { transform: translateY(-100%); opacity: 0; }
-    }
-    .ticker-enter {
-      animation: slideIn 0.5s ease-out forwards;
-    }
-    .ticker-exit {
-      animation: slideOut 0.5s ease-out forwards;
-    }
-  `;
-}
+    return 'english';
+  });
+  const [featuredHeadlines, setFeaturedHeadlines] = useState([]);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-const fetchHeadlines = async (category = '') => {
-  try {
-    const url = category ? `/api/headlines?category=${category}` : '/api/headlines';
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch headlines: ${response.statusText}`);
-    }
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-      throw new Error('Invalid response format: Expected an array of headlines');
-    }
-    return data;
-  } catch (error) {
-    console.error('Failed to fetch headlines:', error.message);
-    return [];
-  }
-};
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
 
-export default function BreakingTicker({
-  speed = 3500,
-  pauseOnHover = true,
-  className = '',
-  pollingInterval = 300000,
-  category = '',
-}) {
-  const [headlines, setHeadlines] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const intervalRef = useRef(null);
-  const pollingRef = useRef(null);
-  const retryCount = useRef(0);
-  const maxRetries = 3;
+  const translations = {
+    english: {
+      title: 'News Pulse News Updates',
+      subtitle: 'Your source for real-time news from around the world',
+      languageLabel: 'Language:',
+      categoryLabel: 'Filter by Category:',
+      featuredNews: 'Featured News',
+      noHeadlines: 'No headlines available.',
+      loadMore: 'Load More',
+      allCategories: 'All',
+      technology: 'Technology',
+      sports: 'Sports',
+      business: 'Business',
+      entertainment: 'Entertainment',
+    },
+    hindi: {
+      title: 'न्यूज़ पल्स समाचार अपडेट',
+      subtitle: 'दुनिया भर से रीयल-टाइम समाचार के लिए आपका स्रोत',
+      languageLabel: 'भाषा:',
+      categoryLabel: 'श्रेणी द्वारा फ़िल्टर करें:',
+      featuredNews: 'विशेष समाचार',
+      noHeadlines: 'कोई समाचार उपलब्ध नहीं।',
+      loadMore: 'और लोड करें',
+      allCategories: 'सभी',
+      technology: 'प्रौद्योगिकी',
+      sports: 'खेल',
+      business: 'व्यापार',
+      entertainment: 'मनोरंजन',
+    },
+    gujarati: {
+      title: 'ન્યૂઝ પલ્સ સમાચાર અપડેટ્સ',
+      subtitle: 'વિશ્વભરના રીયલ-ટાઇમ સમાચાર માટે તમારો સ્ત્રોત',
+      languageLabel: 'ભાષા:',
+      categoryLabel: 'શ્રેણી દ્વારા ફિલ્ટર કરો:',
+      featuredNews: 'વિશેષ સમાચાર',
+      noHeadlines: 'કોઈ સમાચાર ઉપલબ્ધ નથી.',
+      loadMore: 'વધુ લોડ કરો',
+      allCategories: 'બધા',
+      technology: 'ટેકનોલોજી',
+      sports: 'રમતગમત',
+      business: 'વ્યવસાય',
+      entertainment: 'મનોરંજન',
+    },
+  };
 
-  const loadHeadlines = useCallback(async () => {
+  const t = translations[language] || translations.english;
+
+  const fetchFeaturedHeadlines = async (selectedCategory, selectedLanguage, pageNum) => {
     setIsLoading(true);
-    const data = await fetchHeadlines(category);
-
-    if (data.length === 0 && retryCount.current < maxRetries) {
-      retryCount.current += 1;
-      console.warn(`Retry attempt ${retryCount.current}/${maxRetries} for fetching headlines`);
-      setTimeout(loadHeadlines, 5000 * retryCount.current);
-      return;
+    try {
+      const url = `/api/headlines?page=${pageNum}${
+        selectedCategory ? `&category=${selectedCategory}` : ''
+      }${selectedLanguage ? `&language=${selectedLanguage}` : ''}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch featured headlines: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format: Expected an array of headlines');
+      }
+      if (pageNum === 1) {
+        setFeaturedHeadlines(data);
+      } else {
+        setFeaturedHeadlines((prev) => [...prev, ...data]);
+      }
+      setHasMore(data.length === 10);
+    } catch (error) {
+      console.error('Error fetching featured headlines:', error.message);
+      setFeaturedHeadlines([]);
+      setHasMore(false);
+    } finally {
+      setIsLoading(false);
     }
-
-    const validHeadlines = data.filter(
-      (headline) => headline && typeof headline.text === 'string' && headline.text.trim() !== ''
-    );
-
-    setHeadlines(validHeadlines);
-    setIsLoading(false);
-    setLastUpdated(new Date().toLocaleTimeString());
-    retryCount.current = 0;
-
-    if (validHeadlines.length === 0) {
-      setError('No valid headlines available');
-    } else {
-      setError(null);
-    }
-  }, [category]);
+  };
 
   useEffect(() => {
-    loadHeadlines();
-    pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
+    fetchFeaturedHeadlines(category, language, page);
+  }, [category, language, page]);
 
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, [loadHeadlines, pollingInterval]);
-
-  const startTicker = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = window.setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % (headlines.length || 1));
-    }, speed);
-  }, [speed, headlines.length]);
-
-  useEffect(() => {
-    if (headlines.length > 0 && !isPaused) {
-      startTicker();
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [headlines.length, isPaused, startTicker]);
-
-  const handleMouseEnter = () => {
-    if (pauseOnHover) setIsPaused(true);
+  const handleLoadMore = () => {
+    setPage((prev) => prev + 1);
   };
 
-  const handleMouseLeave = () => {
-    if (pauseOnHover) setIsPaused(false);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === ' ') {
-      e.preventDefault();
-      setIsPaused(!isPaused);
-    }
-  };
-
-  if (isLoading && headlines.length === 0) {
-    return (
-      <div className={`bg-black text-white px-4 py-2 ${className}`}>
-        Loading headlines...
-      </div>
-    );
-  }
-
-  if (error && headlines.length === 0) {
-    return (
-      <div className={`bg-black text-red-500 px-4 py-2 ${className}`}>
-        {error}
-      </div>
-    );
-  }
+  const fontClass = language === 'hindi' ? 'font-hindi' : language === 'gujarati' ? 'font-gujarati' : 'font-english';
 
   return (
-    <>
-      {tickerStyles && <style>{tickerStyles}</style>}
-      <div
-        className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
-        role="marquee"
-        aria-live="polite"
+    <div className={`min-h-screen bg-gray-100 ${fontClass}`}>
+      <Head>
+        <title>{t.title}</title>
+        <meta name="description" content={t.subtitle} />
+      </Head>
+
+      <header
+        className="relative bg-cover bg-center h-64 flex items-center justify-center"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1504711434969-e3388611e4c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
+        }}
       >
-        <span className="text-red-500 animate-pulse" aria-hidden="true">
-          🔴 LIVE
-        </span>
-        <div className="relative flex-1 overflow-hidden">
-          <span
-            key={currentIndex}
-            className="ticker-enter inline-block"
-            aria-label={headlines[currentIndex]?.text || 'No headline available'}
-          >
-            {headlines[currentIndex]?.text || 'No headline available'}
-            {headlines[currentIndex]?.source && (
-              <span className="text-gray-400 text-sm ml-2">
-                ({headlines[currentIndex].source})
-              </span>
-            )}
-          </span>
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative z-10 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white">{t.title}</h1>
+          <p className="mt-2 text-lg text-gray-200">{t.subtitle}</p>
         </div>
-        {lastUpdated && (
-          <span className="text-gray-500 text-sm" aria-hidden="true">
-            Updated: {lastUpdated}
-          </span>
+      </header>
+
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
+          <div className="flex items-center space-x-4">
+            <label htmlFor="language" className="text-lg font-medium text-gray-700">
+              {t.languageLabel}
+            </label>
+            <select
+              id="language"
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value);
+                setPage(1);
+              }}
+              className="p-2 border rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="english">English</option>
+              <option value="hindi">हिन्दी</option>
+              <option value="gujarati">ગુજરાતી</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <label htmlFor="category" className="text-lg font-medium text-gray-700">
+              {t.categoryLabel}
+            </label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setPage(1);
+              }}
+              className="p-2 border rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t.allCategories}</option>
+              <option value="technology">{t.technology}</option>
+              <option value="sports">{t.sports}</option>
+              <option value="business">{t.business}</option>
+              <option value="entertainment">{t.entertainment}</option>
+            </select>
+          </div>
+        </div>
+
+        <BreakingTicker
+          className="news-pulse-ticker"
+          speed={50}
+          pollingInterval={300000}
+          category={category}
+          language={language}
+        />
+
+        <section className="mt-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t.featuredNews}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredHeadlines.length === 0 && !isLoading ? (
+              <p className="col-span-full text-center text-gray-500">{t.noHeadlines}</p>
+            ) : (
+              featuredHeadlines.map((headline) => (
+                <div
+                  key={headline.id || Math.random()}
+                  className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+                >
+                  <h3 className="text-lg font-medium text-gray-800">{headline.text || 'No title'}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{headline.source || 'Unknown'}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {headline.publishedAt
+                      ? new Date(headline.publishedAt).toLocaleDateString(
+                          language === 'hindi' ? 'hi-IN' : language === 'gujarati' ? 'gu-IN' : 'en-US'
+                        )
+                      : 'No date'}
+                  </p>
+                </div>
+              ))
+            )}
+            {isLoading &&
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-md p-4">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              ))}
+          </div>
+        </section>
+
+        {hasMore && !isLoading && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={handleLoadMore}
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              {t.loadMore}
+            </button>
+          </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
