@@ -1,14 +1,45 @@
+// components/BreakingTicker.js
 import { useEffect, useState, useCallback, useRef } from 'react';
-import '../styles/BreakingTicker.css'; // We’ll create this file
 
-const fetchHeadlines = async () => {
+// Import CSS with a fallback (in case the file is missing)
+let tickerStyles = '';
+try {
+  tickerStyles = require('../styles/BreakingTicker.css');
+} catch (error) {
+  console.warn('BreakingTicker.css not found. Using fallback styles.');
+  tickerStyles = `
+    @keyframes slideIn {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-100%); opacity: 0; }
+    }
+    .ticker-enter {
+      animation: slideIn 0.5s ease-out forwards;
+    }
+    .ticker-exit {
+      animation: slideOut 0.5s ease-out forwards;
+    }
+  `;
+}
+
+const fetchHeadlines = async (category = '') => {
   try {
-    const response = await fetch('/api/headlines');
-    if (!response.ok) throw new Error('Failed to fetch headlines');
+    const url = category ? `/api/headlines?category=${category}` : '/api/headlines';
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch headlines: ${response.statusText}`);
+    }
     const data = await response.json();
+    // Validate data format
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid response format: Expected an array of headlines');
+    }
     return data;
   } catch (error) {
-    console.error('Failed to fetch headlines:', error);
+    console.error('Failed to fetch headlines:', error.message);
     return [];
   }
 };
@@ -17,7 +48,8 @@ export default function BreakingTicker({
   speed = 3500,
   pauseOnHover = true,
   className = '',
-  pollingInterval = 300000 // 5 minutes
+  pollingInterval = 300000, // 5 minutes
+  category = '', // Add category prop
 }) {
   const [headlines, setHeadlines] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,31 +65,37 @@ export default function BreakingTicker({
   // Fetch headlines with retry logic
   const loadHeadlines = useCallback(async () => {
     setIsLoading(true);
-    const data = await fetchHeadlines();
-    
+    const data = await fetchHeadlines(category);
+
     if (data.length === 0 && retryCount.current < maxRetries) {
       retryCount.current += 1;
+      console.warn(`Retry attempt ${retryCount.current}/${maxRetries} for fetching headlines`);
       setTimeout(loadHeadlines, 5000 * retryCount.current); // Exponential backoff
       return;
     }
 
-    setHeadlines(data);
+    // Validate headline format
+    const validHeadlines = data.filter(
+      (headline) => headline && typeof headline.text === 'string' && headline.text.trim() !== ''
+    );
+
+    setHeadlines(validHeadlines);
     setIsLoading(false);
     setLastUpdated(new Date().toLocaleTimeString());
     retryCount.current = 0;
-    
-    if (data.length === 0) {
-      setError('No headlines available');
+
+    if (validHeadlines.length === 0) {
+      setError('No valid headlines available');
     } else {
       setError(null);
     }
-  }, []);
+  }, [category]); // Add category to dependencies
 
   // Initial fetch and periodic polling
   useEffect(() => {
     loadHeadlines();
     pollingRef.current = window.setInterval(loadHeadlines, pollingInterval);
-    
+
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
@@ -114,37 +152,40 @@ export default function BreakingTicker({
   }
 
   return (
-    <div
-      className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      role="marquee"
-      aria-live="polite"
-    >
-      <span className="text-red-500 animate-pulse" aria-hidden="true">
-        🔴 LIVE
-      </span>
-      <div className="relative flex-1 overflow-hidden">
-        <span
-          key={currentIndex}
-          className="ticker-enter inline-block"
-          aria-label={headlines[currentIndex]?.text}
-        >
-          {headlines[currentIndex]?.text}
-          {headlines[currentIndex]?.source && (
-            <span className="text-gray-400 text-sm ml-2">
-              ({headlines[currentIndex].source})
-            </span>
-          )}
+    <>
+      {tickerStyles && <style>{tickerStyles}</style>}
+      <div
+        className={`bg-black text-white px-4 py-2 flex items-center space-x-3 overflow-x-auto whitespace-nowrap font-sans ${className}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="marquee"
+        aria-live="polite"
+      >
+        <span className="text-red-500 animate-pulse" aria-hidden="true">
+          🔴 LIVE
         </span>
+        <div className="relative flex-1 overflow-hidden">
+          <span
+            key={currentIndex}
+            className="ticker-enter inline-block"
+            aria-label={headlines[currentIndex]?.text || 'No headline available'}
+          >
+            {headlines[currentIndex]?.text || 'No headline available'}
+            {headlines[currentIndex]?.source && (
+              <span className="text-gray-400 text-sm ml-2">
+                ({headlines[currentIndex].source})
+              </span>
+            )}
+          </span>
+        </div>
+        {lastUpdated && (
+          <span className="text-gray-500 text-sm" aria-hidden="true">
+            Updated: {lastUpdated}
+          </span>
+        )}
       </div>
-      {lastUpdated && (
-        <span className="text-gray-500 text-sm" aria-hidden="true">
-          Updated: {lastUpdated}
-        </span>
-      )}
-    </div>
+    </>
   );
 }
