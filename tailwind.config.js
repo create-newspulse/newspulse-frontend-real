@@ -9,7 +9,7 @@ module.exports = {
       fontFamily: {
         english: ['Inter', 'sans-serif'],
         hindi: ['Noto Sans Devanagari', 'sans-serif'],
-        gujarati: ['Shruti', 'sans-serif'],
+        gujarati: ['Noto Sans Gujarati', 'sans-serif'],
       },
     },
   },
